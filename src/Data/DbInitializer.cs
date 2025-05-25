@@ -36,7 +36,20 @@ public static class DbInitializer
         {
             var users = Enumerable
                 .Range(0, 100)
-                .Select((_) => new User() { DisplayName = Faker.Internet.UserName(), CreatedOn = DateTime.UtcNow.AddYears(-5).AddMonths(-1 * Random.Shared.Next(0, 10)).AddHours(Random.Shared.Next(0, 12)) })
+                .Select((_) => new User()
+                {
+                    UserName = Faker.Internet.UserName(),
+                    EmailAddress = Faker.Internet.Email(),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(Faker.Internet.UserName()),
+                    CreatedOn = DateTime.UtcNow.AddYears(-5).AddMonths(-1 * Random.Shared.Next(0, 10)).AddHours(Random.Shared.Next(0, 12))
+                })
+                .Append(new()
+                {
+                    UserName = "testing",
+                    EmailAddress = "testing@example.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"),
+                    CreatedOn = DateTime.UtcNow
+                })
                 .ToArray();
 
             await ctx.Users.AddRangeAsync(users);
@@ -46,7 +59,7 @@ public static class DbInitializer
             var date = DateTime.UtcNow;
             for (var j = 0; j < 5000; j++)
             {
-                var user = users[Random.Shared.Next(0, 99)];
+                var user = users[Random.Shared.Next(1, 100)];
                 var site = sites[j % 3];
 
                 await ctx.Posts.AddAsync(new Post()
@@ -56,7 +69,7 @@ public static class DbInitializer
                     PostedOn = date,
                     Title = Faker.Lorem.Sentence(),
                     Body = string.Join("\n", Faker.Lorem.Paragraphs(3)),
-                    MoreInside = Random.Shared.Next(0, 1) == 1 ? string.Empty : string.Join("\n", Faker.Lorem.Paragraphs(3)),
+                    MoreInside = Random.Shared.Next(0, 3) == 1 ? string.Empty : string.Join("\n", Faker.Lorem.Paragraphs(3)),
                 });
 
                 date = date.AddHours(-1 * Random.Shared.Next(2, 10));
