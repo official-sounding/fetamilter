@@ -11,7 +11,7 @@
             <p>@Html.DisplayFor(_ => item.Body)</p>
         </div>
         <div class="logline">
-            Posted by <a href="#">@Html.DisplayFor(_ => item.PostedBy.DisplayName)</a> on @Html.DisplayFor(_ => item.PostedOn)
+            Posted by <a href="#">@Html.DisplayFor(_ => item.PostedBy.UserName)</a> on @Html.DisplayFor(_ => item.PostedOn)
         </div>
         <hr />
 }
