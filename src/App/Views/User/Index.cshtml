@@ -1,0 +1,15 @@
+@model App.Models.UserpageModel;
+@{
+    ViewData["Title"] = $"User Details";
+}
+<div class="content">
+    <h1>@Model.User.UserName 's Profile</h1>
+    <hr>
+    <div class="counts">
+        <ul>
+            @foreach (var item in Model.Counts) {
+                <li>@item.site : @item.posts posts,# @item.comments comments</li>
+            }
+        </ul>
+    </div>
+</div>
