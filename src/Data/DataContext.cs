@@ -9,6 +9,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Post> Posts { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Site> Sites { get; set; }
+    public DbSet<Comment> Comments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,12 +21,17 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
             .ToTable("User")
             .HasIndex((u) => u.UserName, "idx_user_username");
 
+        modelBuilder.Entity<Comment>()
+            .ToTable("Comment");
+
+
+
+        modelBuilder.Entity<Post>().ToTable("Post");
+
         if (Database.IsSqlite())
         {
             modelBuilder.Entity<User>().Property((u) => u.UserName).UseCollation("NOCASE");
         }
-        modelBuilder.Entity<Post>().ToTable("Post");
-
     }
 
 }

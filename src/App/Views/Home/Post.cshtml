@@ -1,0 +1,31 @@
+@model App.Models.PostpageModel;
+@{
+    ViewData["Title"] = $"Post";
+}
+
+<div class="content">
+<h1>@Model.Post.Site.Title</h1>
+
+
+<h2>@Html.DisplayFor(m => m.Post.Title)</h2>
+<div class="postBody">
+    <p>@Html.DisplayFor(m => m.Post.Body)</p>
+</div>
+<div class="logline">
+    Posted by <a href="#">@Html.DisplayFor(m => m.Post.PostedBy.UserName)</a> 
+    on @Html.DisplayFor(m => m.Post.PostedOn)
+</div>
+<hr />
+<div id="comments">
+@foreach (var comment in Model.Post.Comments) {
+    <div class="comment" id="@comment.ID">
+        <p>@Html.DisplayFor(_ => comment.Body)</p>
+        <div class="logline">
+            Posted by <a href="#">@Html.DisplayFor(_ => comment.PostedBy.UserName)</a> 
+            on @Html.DisplayFor(_ => comment.PostedOn)
+        </div>
+    </div>
+}
+</div>
+
+</div>
