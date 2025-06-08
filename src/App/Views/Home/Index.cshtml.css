@@ -1,0 +1,9 @@
+article .logline {
+    background-color: #e0e0e0;
+    padding: 0.2rem 0.1rem;
+    font-size: 0.8rem;
+}
+
+article .post {
+    line-height: 1.5;
+}

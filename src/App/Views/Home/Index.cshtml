@@ -5,28 +5,35 @@
 
 <div class="content">
     <h1>@Model.Site.Title</h1>
-    @foreach (var item in Model.Posts) {
-        <div class="post">
-            <h2>@Html.DisplayFor(_ => item.Post.Title)</h2>
-            <p>@Html.DisplayFor(_ => item.Post.Body)</p>
-        </div>
-        <div class="logline">
-            Posted by <a href="#">@Html.DisplayFor(_ => item.Post.PostedBy.UserName)</a> 
-            on @Html.DisplayFor(_ => item.Post.PostedOn)
-            <span>
-                <a href="/@item.Post.ID">@Html.DisplayFor(_ => item.CommentCount) @(item.CommentCount == 1 ? "Comment" : "Comments")</a>
-            </span>
-        </div>
+    @foreach (var item in Model.Posts)
+    {
+        <article>
+            <div class="post">
+                <h2><a href="/@item.Post.ID">@Html.DisplayFor(_ => item.Post.Title)</a></h2>
+                <p>@Html.DisplayFor(_ => item.Post.Body)</p>
+            </div>
+            <div class="logline">
+                Posted by <a href="#">@Html.DisplayFor(_ => item.Post.PostedBy.UserName)</a>
+                on @Html.DisplayFor(_ => item.Post.PostedOn)
+
+                <a href="/@item.Post.ID">
+                    @Html.DisplayFor(_ => item.CommentCount)
+                    @(item.CommentCount == 1 ? "Comment" : "Comments")
+                </a>
+            </div>
+        </article>
         <hr />
-}
+    }
 </div>
 
 <div>
-    @if(Model.Posts.HasPreviousPage) {
+    @if (Model.Posts.HasPreviousPage)
+    {
         <a href="#">&lt; Prev Page</a>
     }
 
-    @if(Model.Posts.HasNextPage) {
+    @if (Model.Posts.HasNextPage)
+    {
         <a href="#">Next Page &gt;</a>
     }
 </div>
