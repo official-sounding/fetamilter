@@ -1,16 +1,19 @@
 @model App.Models.HeaderModel;
 
 <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@Model.SubSite</a>
-            </div>
-            <div class="user-details">
-                @if (Model.IsLoggedIn) {
-                    @Html.DisplayFor(m => m.Username)
-                } else {
-                    <a href="/login">Login</a>
-                }
-            </div>
-        </nav>
-    </header>
+    <nav>
+        <div class="site-title">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@Model.SubSite</a>
+        </div>
+        <div class="user-details">
+            @if (Model.IsLoggedIn)
+            {
+                @Html.DisplayFor(m => m.Username)
+            }
+            else
+            {
+                <a href="/login">Login</a>
+            }
+        </div>
+    </nav>
+</header>

@@ -1,0 +1,23 @@
+header {
+    position: sticky;
+    top: 0;
+    background-color: lightcyan;
+}
+
+header nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: .5rem 0;
+}
+
+.site-title {
+    margin-left: 3rem;
+    font-size: 1.5rem;
+}
+
+.user-details {
+    margin-right: 3rem;
+    font-size: 1.25rem;
+}
