@@ -57,12 +57,13 @@ public static class DbInitializer
 
 
             var date = DateTime.UtcNow;
-            for (var j = 0; j < 5000; j++)
+            for (var j = 0; j < 1000; j++)
             {
                 var user = users[Random.Shared.Next(1, 100)];
                 var site = sites[j % 3];
 
-                await ctx.Posts.AddAsync(new Post()
+
+                var post = await ctx.Posts.AddAsync(new Post()
                 {
                     Site = site,
                     PostedBy = user,
@@ -71,6 +72,17 @@ public static class DbInitializer
                     Body = string.Join("\n", Faker.Lorem.Paragraphs(3)),
                     MoreInside = Random.Shared.Next(0, 3) == 1 ? string.Empty : string.Join("\n", Faker.Lorem.Paragraphs(3)),
                 });
+
+
+                var comments = Enumerable.Range(0, Random.Shared.Next(0, 5)).Select((_) => new Comment()
+                {
+                    PostedBy = users[Random.Shared.Next(1, 100)],
+                    PostedOn = date.AddMinutes(Random.Shared.Next(1, 30)),
+                    Post = post.Entity,
+                    Body = string.Join("\n", Faker.Lorem.Paragraphs(2))
+                });
+
+                await ctx.Comments.AddRangeAsync(comments);
 
                 date = date.AddHours(-1 * Random.Shared.Next(2, 10));
             }
