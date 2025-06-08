@@ -14,10 +14,14 @@ html {
 }
 
 body {
-    margin-bottom: 60px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
 }
 
-.container {
+main {
     margin: 0 3rem;
+    margin-bottom: 40px;
 }
