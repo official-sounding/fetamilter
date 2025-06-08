@@ -45,6 +45,7 @@ public class HomeController(DataContext context, ILogger<HomeController> logger)
 
         return View(new PostpageModel() { Post = post });
     }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
