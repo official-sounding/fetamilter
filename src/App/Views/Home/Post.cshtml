@@ -4,28 +4,38 @@
 }
 
 <div class="content">
-<h1>@Model.Post.Site.Title</h1>
+    <h1>@Model.Post.Site.Title</h1>
 
-
-<h2>@Html.DisplayFor(m => m.Post.Title)</h2>
-<div class="postBody">
-    <p>@Html.DisplayFor(m => m.Post.Body)</p>
-</div>
-<div class="logline">
-    Posted by <a href="#">@Html.DisplayFor(m => m.Post.PostedBy.UserName)</a> 
-    on @Html.DisplayFor(m => m.Post.PostedOn)
-</div>
-<hr />
-<div id="comments">
-@foreach (var comment in Model.Post.Comments) {
-    <div class="comment" id="@comment.ID">
-        <p>@Html.DisplayFor(_ => comment.Body)</p>
-        <div class="logline">
-            Posted by <a href="#">@Html.DisplayFor(_ => comment.PostedBy.UserName)</a> 
-            on @Html.DisplayFor(_ => comment.PostedOn)
+    <article>
+        <h2>@Html.DisplayFor(m => m.Post.Title)</h2>
+        <h3>@Html.DisplayFor(m => m.Post.PostedOn)</h3>
+        <div class="postBody">
+            <p>@Html.DisplayFor(m => m.Post.Body)</p>
         </div>
+        @if (!string.IsNullOrWhiteSpace(@Model.Post.MoreInside))
+        {
+            <hr>
+            <p class="moreInside">
+                @Html.DisplayFor(m => m.Post.MoreInside)
+            </p>
+        }
+        <div class="logline">
+            Posted by <a href="#">@Html.DisplayFor(m => m.Post.PostedBy.UserName)</a>
+            (@Model.Post.Comments.Count comments total)
+        </div>
+    </article>
+
+    <div id="comments">
+        @foreach (var comment in Model.Post.Comments)
+        {
+            <div class="comment" id="@comment.ID">
+                <p>@Html.DisplayFor(_ => comment.Body)</p>
+                <div class="logline">
+                    Posted by <a href="#">@Html.DisplayFor(_ => comment.PostedBy.UserName)</a>
+                    on @Html.DisplayFor(_ => comment.PostedOn)
+                </div>
+            </div>
+        }
     </div>
-}
-</div>
 
 </div>
