@@ -22,10 +22,29 @@ public class HomeController(DataContext context, ILogger<HomeController> logger)
         return View(new HomepageModel()
         {
             Site = site,
-            Posts = await PaginatedList<Post>.CreateAsync(posts.AsNoTracking(), pageNumber ?? 1, PageSize)
+            Posts = await PaginatedList<HomepageModel.PostModel>.CreateAsync(posts.AsNoTracking().Select(p => new HomepageModel.PostModel(p, p.Comments.Count(), 0)), pageNumber ?? 1, PageSize)
         });
     }
 
+    [HttpGet("{postId:int}")]
+    public async Task<IActionResult> Post(int postId)
+    {
+        var post = await context.Posts
+            .Where(p => p.ID == postId)
+            .Where(p => p.Site.Slug == SubSite)
+            .Include(p => p.Site)
+            .Include(p => p.PostedBy)
+            .SingleOrDefaultAsync();
+
+        if (post is null)
+        {
+            return NotFound();
+        }
+
+        await context.Comments.Where(c => c.Post.ID == postId).Include(c => c.PostedBy).LoadAsync();
+
+        return View(new PostpageModel() { Post = post });
+    }
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

@@ -7,11 +7,15 @@
     <h1>@Model.Site.Title</h1>
     @foreach (var item in Model.Posts) {
         <div class="post">
-            <h2>@Html.DisplayFor(_ => item.Title)</h2>
-            <p>@Html.DisplayFor(_ => item.Body)</p>
+            <h2>@Html.DisplayFor(_ => item.Post.Title)</h2>
+            <p>@Html.DisplayFor(_ => item.Post.Body)</p>
         </div>
         <div class="logline">
-            Posted by <a href="#">@Html.DisplayFor(_ => item.PostedBy.UserName)</a> on @Html.DisplayFor(_ => item.PostedOn)
+            Posted by <a href="#">@Html.DisplayFor(_ => item.Post.PostedBy.UserName)</a> 
+            on @Html.DisplayFor(_ => item.Post.PostedOn)
+            <span>
+                <a href="/@item.Post.ID">@Html.DisplayFor(_ => item.CommentCount) @(item.CommentCount == 1 ? "Comment" : "Comments")</a>
+            </span>
         </div>
         <hr />
 }

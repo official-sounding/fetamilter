@@ -11,4 +11,6 @@ public class Post
     public required User PostedBy { get; set; }
     public DateTime PostedOn { get; set; }
 
+    public ICollection<Comment> Comments { get; set; } = [];
+
 }
