@@ -3,7 +3,7 @@
 <header>
     <nav>
         <div class="site-title">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@Model.SubSite</a>
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@Model.Site.Title</a>
         </div>
         <div class="user-details">
             @if (Model.IsLoggedIn)

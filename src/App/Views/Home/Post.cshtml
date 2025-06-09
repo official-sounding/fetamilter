@@ -1,23 +1,22 @@
 @model App.Models.PostpageModel;
+@using Westwind.AspNetCore.Markdown
 @{
     ViewData["Title"] = $"Post";
 }
 
 <div class="content">
-    <h1>@Model.Post.Site.Title</h1>
-
     <article>
         <h2>@Html.DisplayFor(m => m.Post.Title)</h2>
         <h3>@Html.DisplayFor(m => m.Post.PostedOn)</h3>
         <div class="postBody">
-            <p>@Html.DisplayFor(m => m.Post.Body)</p>
+            @Html.Raw(Markdown.Parse(Model.Post.Body))
         </div>
-        @if (!string.IsNullOrWhiteSpace(@Model.Post.MoreInside))
+        @if (!string.IsNullOrWhiteSpace(Model.Post.MoreInside))
         {
             <hr>
-            <p class="moreInside">
-                @Html.DisplayFor(m => m.Post.MoreInside)
-            </p>
+            <div class="moreInside">
+                @Html.Raw(Markdown.Parse(Model.Post.MoreInside))
+            </div>
         }
         <div class="logline">
             Posted by <a href="#">@Html.DisplayFor(m => m.Post.PostedBy.UserName)</a>
@@ -29,7 +28,7 @@
         @foreach (var comment in Model.Post.Comments)
         {
             <div class="comment" id="@comment.ID">
-                <p>@Html.DisplayFor(_ => comment.Body)</p>
+                @Html.Raw(Markdown.Parse(comment.Body))
                 <div class="logline">
                     Posted by <a href="#">@Html.DisplayFor(_ => comment.PostedBy.UserName)</a>
                     on @Html.DisplayFor(_ => comment.PostedOn)

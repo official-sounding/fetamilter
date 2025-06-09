@@ -1,3 +1,5 @@
+using Data.Models;
+
 namespace App.Models;
 
-public record HeaderModel(string SubSite, bool IsLoggedIn, string? Username);
+public record HeaderModel(Site Site, bool IsLoggedIn, string? Username);
