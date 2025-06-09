@@ -57,15 +57,18 @@ public static class DbInitializer
 
 
             var date = DateTime.UtcNow;
+            int[] siteCounts = [1, 1, 1];
             for (var j = 0; j < 1000; j++)
             {
                 var user = users[Random.Shared.Next(1, 100)];
                 var site = sites[j % 3];
+                var num = siteCounts[j % 3];
 
 
                 var post = await ctx.Posts.AddAsync(new Post()
                 {
                     Site = site,
+                    Number = num,
                     PostedBy = user,
                     PostedOn = date,
                     Title = Faker.Lorem.Sentence(),
@@ -84,6 +87,7 @@ public static class DbInitializer
 
                 await ctx.Comments.AddRangeAsync(comments);
 
+                siteCounts[j % 3]++;
                 date = date.AddHours(-1 * Random.Shared.Next(1, 4));
             }
 

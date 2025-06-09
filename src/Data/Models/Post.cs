@@ -3,6 +3,7 @@ namespace Data.Models;
 public class Post
 {
     public int ID { get; set; }
+    public int Number { get; set; }
     public required string Title { get; set; }
     public required string Body { get; set; }
     public string? MoreInside { get; set; }
