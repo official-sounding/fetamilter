@@ -73,7 +73,7 @@ public static class DbInitializer
                     PostedOn = date,
                     Title = Faker.Lorem.Sentence(),
                     Body = string.Join("\n", Faker.Lorem.Paragraphs(Random.Shared.Next(2, 5))),
-                    MoreInside = Random.Shared.Next(0, 3) == 1 ? string.Empty : string.Join("\n", Faker.Lorem.Paragraphs(3)),
+                    MoreInside = Random.Shared.Next(0, 3) == 1 ? string.Empty : string.Join("\n\n", Faker.Lorem.Paragraphs(3)),
                 });
 
 
@@ -82,7 +82,7 @@ public static class DbInitializer
                     PostedBy = users[Random.Shared.Next(1, 100)],
                     PostedOn = date.AddMinutes(Random.Shared.Next(1, 30)),
                     Post = post.Entity,
-                    Body = string.Join("\n", Faker.Lorem.Paragraphs(2))
+                    Body = string.Join("\n\n", Faker.Lorem.Paragraphs(2))
                 });
 
                 await ctx.Comments.AddRangeAsync(comments);
