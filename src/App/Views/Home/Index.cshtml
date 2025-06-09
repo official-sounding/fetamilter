@@ -4,7 +4,6 @@
 }
 
 <div class="content">
-    <h1>@Model.Site.Title</h1>
     @foreach (var item in Model.Posts)
     {
         <article>
@@ -16,7 +15,7 @@
                 Posted by <a href="#">@Html.DisplayFor(_ => item.Post.PostedBy.UserName)</a>
                 on @Html.DisplayFor(_ => item.Post.PostedOn)
 
-                <a href="/@item.Post.ID">
+                <a href="/@item.Post.Number">
                     @Html.DisplayFor(_ => item.CommentCount)
                     @(item.CommentCount == 1 ? "Comment" : "Comments")
                 </a>

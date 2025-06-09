@@ -26,22 +26,23 @@ public class HomeController(DataContext context, ILogger<HomeController> logger)
         });
     }
 
-    [HttpGet("{postId:int}")]
-    public async Task<IActionResult> Post(int postId)
+    [HttpGet("{postNum:int}")]
+    public async Task<IActionResult> Post(int postNum)
     {
         var post = await context.Posts
-            .Where(p => p.ID == postId)
+            .Where(p => p.Number == postNum)
             .Where(p => p.Site.Slug == SubSite)
             .Include(p => p.Site)
             .Include(p => p.PostedBy)
-            .SingleOrDefaultAsync();
+            .OrderBy(p => p.ID)
+            .FirstOrDefaultAsync();
 
         if (post is null)
         {
             return NotFound();
         }
 
-        await context.Comments.Where(c => c.Post.ID == postId).Include(c => c.PostedBy).LoadAsync();
+        await context.Comments.Where(c => c.Post.ID == post.ID).Include(c => c.PostedBy).LoadAsync();
 
         return View(new PostpageModel() { Post = post });
     }

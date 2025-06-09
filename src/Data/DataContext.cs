@@ -26,7 +26,9 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
 
 
 
-        modelBuilder.Entity<Post>().ToTable("Post");
+        modelBuilder.Entity<Post>()
+        .ToTable("Post")
+        .HasIndex("SiteID", nameof(Post.Number));
 
         if (Database.IsSqlite())
         {
