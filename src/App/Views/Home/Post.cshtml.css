@@ -1,0 +1,23 @@
+h3 {
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+#comments {
+    margin-left: 2rem;
+}
+
+article {
+    padding-bottom: 4rem;
+}
+
+article .logline {
+    padding: 0.2rem 0.1rem;
+    font-size: 0.8rem;
+}
+
+#comments .logline {
+    background-color: #e0e0e0;
+    padding: 0.2rem 0.1rem;
+    font-size: 0.8rem;
+}
