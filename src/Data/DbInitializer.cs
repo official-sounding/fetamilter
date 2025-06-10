@@ -10,6 +10,8 @@ public static class DbInitializer
         await ctx.Database.EnsureCreatedAsync();
 
         Site[] sites;
+        Role[] roles;
+
         if (!ctx.Sites.Any())
         {
             sites = [
@@ -18,16 +20,20 @@ public static class DbInitializer
                 new() { Slug = "meta", Title = "FetaTalk" }
             ];
 
-            foreach (var s in sites)
-            {
-                await ctx.Sites.AddAsync(s);
-            }
+            roles = [
+                new() { Name = "User" },
+                new() { Name = "Moderator", NameTag = "Staff" }
+            ];
 
+
+            await ctx.Sites.AddRangeAsync(sites);
+            await ctx.Roles.AddRangeAsync(roles);
             await ctx.SaveChangesAsync();
         }
         else
         {
             sites = await ctx.Sites.ToArrayAsync();
+            roles = await ctx.Roles.ToArrayAsync();
         }
 
         var sitesBySlug = sites.ToDictionary((s) => s.Slug);
@@ -41,15 +47,19 @@ public static class DbInitializer
                     UserName = Faker.Internet.UserName(),
                     EmailAddress = Faker.Internet.Email(),
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(Faker.Internet.UserName()),
-                    CreatedOn = DateTime.UtcNow.AddYears(-5).AddMonths(-1 * Random.Shared.Next(0, 10)).AddHours(Random.Shared.Next(0, 12))
+                    CreatedOn = DateTime.UtcNow.AddYears(-5).AddMonths(-1 * Random.Shared.Next(0, 10)).AddHours(Random.Shared.Next(0, 12)),
+                    Role = roles[0]
                 })
                 .Append(new()
                 {
-                    UserName = "testing",
+                    UserName = "testing-mod",
                     EmailAddress = "testing@example.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"),
-                    CreatedOn = DateTime.UtcNow
+                    CreatedOn = DateTime.UtcNow,
+                    Role = roles[1]
+
                 })
+                .DistinctBy(u => u.UserName)
                 .ToArray();
 
             await ctx.Users.AddRangeAsync(users);
@@ -60,7 +70,7 @@ public static class DbInitializer
             int[] siteCounts = [1, 1, 1];
             for (var j = 0; j < 1000; j++)
             {
-                var user = users[Random.Shared.Next(1, 100)];
+                var user = users[Random.Shared.Next(0, users.Length - 2)];
                 var site = sites[j % 3];
                 var num = siteCounts[j % 3];
 

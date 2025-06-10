@@ -48,6 +48,16 @@ public class UserController(ILogger<UserController> logger, IAccountService acco
                     new(ClaimTypes.Role, "make_comment"),
                 };
 
+                if (user.Role.Name == "Moderator")
+                {
+                    claims.AddRange([
+                        new(ClaimTypes.Role, "delete_post"),
+                        new(ClaimTypes.Role, "delete_comment"),
+                        new(ClaimTypes.Role, "disable_user"),
+                        new(ClaimTypes.Role, "view_flags")
+                    ]);
+                }
+
                 var claimsIdentity = new ClaimsIdentity(
                     claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -55,6 +65,7 @@ public class UserController(ILogger<UserController> logger, IAccountService acco
                 {
                     IsPersistent = model.RememberMe,
                     AllowRefresh = true,
+                    ExpiresUtc = DateTime.UtcNow.AddDays(365)
                 };
 
                 await HttpContext.SignInAsync(

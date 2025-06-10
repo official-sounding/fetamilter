@@ -8,15 +8,15 @@
     <form method="post">
         <div>
             <label for="username">Username</label>
-            <input type="text" name="username" value="@Model.Username"/>
+            <input type="text" name="username" asp-for="Username"/>
         </div>
         <div>
             <label for="passowrd">Password</label>
-            <input type="password" name="password" value="@Model.Password"/>
+            <input type="password" name="password" asp-for="Password"/>
         </div>
         <div>
             <label for="rememberMe">
-                <input type="checkbox" name="rememberMe" value="@Model.RememberMe"/>
+                <input type="checkbox" name="rememberMe" asp-for="RememberMe" />
                 Remember Me
             </label>
         </div>
