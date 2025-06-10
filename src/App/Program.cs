@@ -1,3 +1,4 @@
+using App.Config;
 using App.Services;
 using Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -5,13 +6,27 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<SiteConfig>(builder.Configuration.GetSection(SiteConfig.SECTION));
+
+var siteConfig = builder.Configuration.GetSection(SiteConfig.SECTION).Get<SiteConfig>();
+
+ArgumentNullException.ThrowIfNull(siteConfig);
+
 // Add services to the container.
 var mvcbuilder = builder.Services.AddControllersWithViews();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddTransient<IAccountService, AccountService>();
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie();
+    .AddCookie(o =>
+    {
+        o.SlidingExpiration = true;
+        o.Cookie.HttpOnly = true;
+        o.LoginPath = "/login";
+        o.ExpireTimeSpan = TimeSpan.FromDays(365);
+        o.Cookie.Domain = $".{siteConfig.RootDomain}";
+        o.Cookie.SameSite = SameSiteMode.Strict;
+    });
 
 builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("main")));

@@ -16,12 +16,20 @@ public class AccountService(ILogger<AccountService> logger, DataContext context)
 {
     public async Task<User?> AuthenticateUser(string? username, string? password)
     {
-        var user = await context.Users.FirstOrDefaultAsync(u => u.UserName.Equals(username));
+        var user = await context.Users
+        .Where(u => u.UserName.Equals(username))
+        .Include(u => u.Role)
+        .FirstOrDefaultAsync();
 
         if (user is null)
         {
             logger.LogDebug("Cannot log in {username}, User not found", username);
             return null;
+        }
+
+        if (user.Disabled)
+        {
+            logger.LogDebug("Cannot log in {username}, account is disabled", username);
         }
 
         if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))

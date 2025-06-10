@@ -9,6 +9,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Post> Posts { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Site> Sites { get; set; }
+    public DbSet<Role> Roles { get; set; }
     public DbSet<Comment> Comments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -19,7 +20,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
 
         modelBuilder.Entity<User>()
             .ToTable("User")
-            .HasIndex((u) => u.UserName, "idx_user_username");
+            .HasIndex((u) => u.UserName, "idx_user_username").IsUnique();
 
         modelBuilder.Entity<Comment>()
             .ToTable("Comment");
@@ -29,6 +30,9 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         modelBuilder.Entity<Post>()
         .ToTable("Post")
         .HasIndex("SiteID", nameof(Post.Number));
+
+        modelBuilder.Entity<Role>()
+            .ToTable("Role");
 
         if (Database.IsSqlite())
         {
