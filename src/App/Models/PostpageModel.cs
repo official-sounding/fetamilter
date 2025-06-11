@@ -5,5 +5,6 @@ namespace App.Models;
 public class PostpageModel
 {
     public required Post Post { get; set; }
+    public string? CommentError { get; set; }
 
 }

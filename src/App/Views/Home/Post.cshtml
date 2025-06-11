@@ -1,7 +1,8 @@
 @model App.Models.PostpageModel;
+@using App.Authorization;
 @using Westwind.AspNetCore.Markdown
 @{
-    ViewData["Title"] = $"Post";
+    ViewData["Title"] = Model.Post.Title;
 }
 
 <div class="content">
@@ -34,6 +35,20 @@
                     on @Html.DisplayFor(_ => comment.PostedOn)
                 </div>
             </div>
+        }
+
+        @if ((await AuthorizationService.AuthorizeAsync(User, Policy.MakeComment)).Succeeded)
+        {
+            <hr>
+            <form method="post" action="@Model.Post.Number/comment">
+                <div class="form-input">
+                    <label for="body">Comment</label>
+                    <textarea name="body" rows="15" cols="60"></textarea>
+                </div>
+                <button type="submit">Post Comment</button>
+            </form> 
+        } else {
+            <p>Please <a href="/login?returnUrl=/@Model.Post.Number">Log In</a> to make a comment</p>
         }
     </div>
 

@@ -43,6 +43,7 @@ public class UserController(ILogger<UserController> logger, IAccountService acco
             {
                 var claims = new List<Claim>
                 {
+                    new(ClaimTypes.Sid, $"{user.ID}"),
                     new(ClaimTypes.Name, user.UserName),
                     new(ClaimTypes.Role, "make_post"),
                     new(ClaimTypes.Role, "make_comment"),
