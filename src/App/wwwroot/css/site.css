@@ -34,3 +34,22 @@ main {
     margin: 0 3rem;
     margin-bottom: 40px;
 }
+
+form .form-input {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+form .form-input label {
+    margin-right: 1rem;
+    font-size: 0.8rem;
+    width: 6rem;
+}
+
+form .form-input textarea {
+    resize: vertical;
+}
+
+form button[type="submit"] {
+    margin-left: 7rem;
+}

@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using App.Authorization;
 using App.Config;
 using App.Services;
 using Data;
@@ -27,6 +29,14 @@ builder.Services
         o.Cookie.Domain = $".{siteConfig.RootDomain}";
         o.Cookie.SameSite = SameSiteMode.Strict;
     });
+
+builder.Services.AddAuthorization(o =>
+{
+    foreach (var p in Policy.AllPolicies)
+    {
+        o.AddPolicy(p, (pol) => pol.RequireClaim(ClaimTypes.Role, p));
+    }
+});
 
 builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("main")));
