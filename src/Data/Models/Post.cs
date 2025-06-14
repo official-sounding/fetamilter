@@ -8,8 +8,10 @@ public class Post
     public required string Body { get; set; }
     public string? MoreInside { get; set; }
 
-    public required Site Site { get; set; }
-    public required User PostedBy { get; set; }
+    public Site? Site { get; set; }
+    public User? PostedBy { get; set; }
+    public int SiteID { get; set; }
+    public int PostedByID { get; set; }
     public DateTime PostedOn { get; set; }
 
     public ICollection<Comment> Comments { get; set; } = [];

@@ -1,17 +1,15 @@
 using System.Security.Claims;
+using App.Authorization;
 using App.Models;
 using App.Services;
-using Data;
-using Data.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace App.Controllers;
 
-public class UserController(ILogger<UserController> logger, IAccountService accountService) : ControllerBase
+public class UserController(ILogger<UserController> logger, ISiteService siteService, IAccountService accountService) : ControllerBase(siteService)
 {
 
     [HttpGet("user/{id:int}")]
@@ -45,17 +43,18 @@ public class UserController(ILogger<UserController> logger, IAccountService acco
                 {
                     new(ClaimTypes.Sid, $"{user.ID}"),
                     new(ClaimTypes.Name, user.UserName),
-                    new(ClaimTypes.Role, "make_post"),
-                    new(ClaimTypes.Role, "make_comment"),
+                    new(ClaimTypes.Role, Policy.MakeComment),
+                    new(ClaimTypes.Role, Policy.MakePost),
                 };
 
                 if (user.Role.Name == "Moderator")
                 {
                     claims.AddRange([
-                        new(ClaimTypes.Role, "delete_post"),
-                        new(ClaimTypes.Role, "delete_comment"),
-                        new(ClaimTypes.Role, "disable_user"),
-                        new(ClaimTypes.Role, "view_flags")
+                        new(ClaimTypes.Role, Policy.DeletePost),
+                        new(ClaimTypes.Role, Policy.DeleteComment),
+                        new(ClaimTypes.Role, Policy.DisableUser),
+                        new(ClaimTypes.Role, Policy.PostOfficially),
+                        new(ClaimTypes.Role, Policy.ViewFlags)
                     ]);
                 }
 

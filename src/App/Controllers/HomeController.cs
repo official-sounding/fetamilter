@@ -7,34 +7,66 @@ using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using App.Authorization;
 using System.Web;
+using App.Services;
 
 namespace App.Controllers;
 
-public class HomeController(DataContext context, ILogger<HomeController> logger) : ControllerBase
+public class HomeController(ISiteService siteService, DataContext context, ILogger<HomeController> logger) : ControllerBase(siteService)
 {
     private const int PageSize = 25;
-    public async Task<IActionResult> Index(int? pageNumber, CancellationToken ct = default)
+    public async Task<IActionResult> Index(int? pageNumber = 0, CancellationToken ct = default)
     {
-        logger.BeginScope(SubSite);
-        logger.LogDebug("Load Homepage for {SubSite}", SubSite);
-        var site = await context.Sites.FirstOrDefaultAsync((s) => s.Slug == SubSite, ct);
-        site ??= await context.Sites.FirstAsync((s) => s.Slug == "www", ct);
+        logger.BeginScope(SiteSlug);
+        logger.LogDebug("Load Homepage for {SubSite}", SiteSlug);
 
-        var posts = context.Posts.Where(p => p.Site == site).Include(p => p.PostedBy);
+        var posts = context.Posts.Where(p => p.Site == SubSite).Include(p => p.PostedBy).OrderByDescending(p => p.PostedOn);
 
         return View(new HomepageModel()
         {
-            Site = site,
+            Site = SubSite,
             Posts = await PaginatedList<HomepageModel.PostModel>.CreateAsync(posts.AsNoTracking().Select(p => new HomepageModel.PostModel(p, p.Comments.Count(), 0)), pageNumber ?? 1, PageSize)
         });
     }
 
+    [HttpGet("create")]
+    [Authorize(Policy = Policy.MakePost)]
+    public IActionResult CreatePost()
+    {
+        return View();
+    }
+
+    [HttpPost("create")]
+    [Authorize(Policy = Policy.MakePost)]
+    public async Task<IActionResult> CreatePost(CreatePostModel post)
+    {
+
+        if (ModelState.IsValid)
+        {
+
+            var dbModel = new Post()
+            {
+                Body = post.Body ?? string.Empty,
+                Title = post.Title ?? string.Empty,
+                MoreInside = post.MoreInside,
+                SiteID = SubSite.ID,
+                PostedByID = User.GetUserId(),
+                PostedOn = DateTime.UtcNow
+            };
+
+            context.Posts.Add(dbModel);
+            await context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        return View(post);
+    }
+
     [HttpGet("{postNum:int}")]
-    public async Task<IActionResult> Post(int postNum, [FromQuery] string? commentError)
+    public async Task<IActionResult> Post(int postNum, [FromQuery] string? commentError = null)
     {
         var post = await context.Posts
             .Where(p => p.Number == postNum)
-            .Where(p => p.Site.Slug == SubSite)
+            .Where(p => p.SiteID == SubSite.ID)
             .Include(p => p.Site)
             .Include(p => p.PostedBy)
             .OrderBy(p => p.ID)
@@ -52,15 +84,15 @@ public class HomeController(DataContext context, ILogger<HomeController> logger)
 
     [HttpPost("{postNum:int}/comment")]
     [Authorize(Policy = Policy.MakeComment)]
-    public async Task<IActionResult> MakeComment(int postNum, [FromForm] MakeCommentModel form)
+    public async Task<IActionResult> CreateComment(int postNum, [FromForm] CreateCommentModel form)
     {
         if (string.IsNullOrWhiteSpace(form?.Body))
         {
-            return RedirectToAction(nameof(Post), "Home", new { postNum, commentError = "cannot post an empty comment" });
+            return RedirectToAction(nameof(Post), new { postNum, commentError = "cannot post an empty comment" });
         }
         var post = await context.Posts
                     .Where(p => p.Number == postNum)
-                    .Where(p => p.Site.Slug == SubSite)
+                    .Where(p => p.SiteID == SubSite.ID)
                     .OrderBy(p => p.ID)
                     .FirstOrDefaultAsync();
 
@@ -80,7 +112,7 @@ public class HomeController(DataContext context, ILogger<HomeController> logger)
         await context.Comments.AddAsync(comment);
         await context.SaveChangesAsync();
 
-        return RedirectToAction(nameof(Post), "Home", new { postNum });
+        return RedirectToAction(nameof(Post), new { postNum });
 
     }
 
