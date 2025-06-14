@@ -89,6 +89,7 @@ public class UserController(ILogger<UserController> logger, ISiteService siteSer
 
 
     [Authorize]
+    [HttpGet("logout")]
     public async Task<ActionResult> Logout()
     {
         await HttpContext.SignOutAsync();
