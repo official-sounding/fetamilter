@@ -20,7 +20,7 @@
             </div>
         }
         <div class="logline">
-            Posted by <a href="#">@Html.DisplayFor(m => m.Post.PostedByUsername)</a>
+            Posted by <a href="/user/@Model.Post.PostedByID">@Html.DisplayFor(m => m.Post.PostedByUsername)</a>
             (@Model.Post.Comments.Count comments total)
         </div>
     </article>
@@ -31,7 +31,7 @@
             <div class="comment" id="@comment.ID">
                 @Html.Raw(Markdown.Parse(comment.Body))
                 <div class="logline">
-                    Posted by <a href="#">@Html.DisplayFor(_ => comment.PostedBy.UserName)</a>
+                    Posted by <a href="/user/@comment.PostedByID">@Html.DisplayFor(_ => comment.PostedBy.UserName)</a>
                     on @Html.DisplayFor(_ => comment.PostedOn)
                 </div>
             </div>

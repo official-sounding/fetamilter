@@ -53,11 +53,28 @@ public class AccountService(ILogger<AccountService> logger, DataContext context)
         using var conn = context.Database.GetDbConnection();
         await conn.OpenAsync();
 
-        var counts = (await conn.QueryAsync<UserSiteCount>(@"select MAX(s.Title) as site, COUNT(*) as posts, 0 as comments
-from post p
-join site s on p.SiteID = s.ID
-where PostedByID = @userId
-group by s.ID", new { userId })).ToList();
+        var counts = (await conn.QueryAsync<UserSiteCount>(@"
+        with posts as (
+	select p.SiteID as site, COUNT(*) as posts
+	from post p
+	where p.PostedByID = @userId
+	group by p.SiteID
+),
+ comments as (
+	select p.SiteID as site, COUNT(*) as comments
+	from comment c
+	join post p on c.PostID = p.ID
+	where c.PostedByID = @userId
+	group by p.SiteID
+)
+SELECT
+	s.Title as Site,
+	ifnull(posts.posts, 0) as posts,
+	ifnull(comments.comments, 0) as comments
+from Site s
+left join posts on posts.site = s.ID
+left join comments on comments.site = s.ID
+order by s.ID", new { userId })).ToList();
         return new() { User = user, Counts = counts };
     }
 }
