@@ -17,6 +17,7 @@ ArgumentNullException.ThrowIfNull(siteConfig);
 // Add services to the container.
 var mvcbuilder = builder.Services.AddControllersWithViews();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddSingleton<ISiteService, SiteService>();
 builder.Services.AddTransient<IAccountService, AccountService>();
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

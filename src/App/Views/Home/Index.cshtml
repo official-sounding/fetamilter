@@ -8,11 +8,11 @@
     {
         <article>
             <div class="post">
-                <h2><a href="/@item.Post.ID">@Html.DisplayFor(_ => item.Post.Title)</a></h2>
+                <h2><a href="/@item.Post.Number">@Html.DisplayFor(_ => item.Post.Title)</a></h2>
                 <p>@Html.DisplayFor(_ => item.Post.Body)</p>
             </div>
             <div class="logline">
-                Posted by <a href="#">@Html.DisplayFor(_ => item.Post.PostedBy.UserName)</a>
+                Posted by <a href="#">@Html.DisplayFor(_ => item.Post.PostedByUsername)</a>
                 on @Html.DisplayFor(_ => item.Post.PostedOn)
 
                 <a href="/@item.Post.Number">

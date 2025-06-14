@@ -1,6 +1,6 @@
 namespace App.Models;
 
-public class MakeCommentModel
+public class CreateCommentModel
 {
     public string? Body { get; set; }
 }

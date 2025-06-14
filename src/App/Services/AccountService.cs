@@ -9,6 +9,7 @@ namespace App.Services;
 public interface IAccountService
 {
     Task<User?> AuthenticateUser(string? username, string? password);
+
     Task<UserpageModel?> BuildUserpageModel(int userId);
 }
 
