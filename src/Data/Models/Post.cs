@@ -16,4 +16,6 @@ public class Post
 
     public ICollection<Comment> Comments { get; set; } = [];
 
+    public string PostedByUsername => PostedBy?.UserName ?? string.Empty;
+
 }

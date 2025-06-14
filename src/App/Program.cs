@@ -40,7 +40,7 @@ builder.Services.AddAuthorization(o =>
 });
 
 builder.Services.AddDbContext<DataContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("main")));
+                options.UseSqlite(builder.Configuration.GetConnectionString("main"), x => x.MigrationsAssembly("Migrations")));
 
 if (builder.Environment.IsDevelopment())
 {
