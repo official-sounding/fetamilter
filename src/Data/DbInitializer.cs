@@ -21,8 +21,8 @@ public static class DbInitializer
             ];
 
             roles = [
-                new() { Name = "User" },
-                new() { Name = "Moderator", NameTag = "Staff" }
+                new() { Name = Role.UserRoleName },
+                new() { Name = Role.ModRoleString, NameTag = "Moderator" }
             ];
 
 
