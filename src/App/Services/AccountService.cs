@@ -3,14 +3,16 @@ using Data;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Dapper;
+using System.Net.Mime;
 
 namespace App.Services;
 
 public interface IAccountService
 {
     Task<User?> AuthenticateUser(string? username, string? password);
-
     Task<UserpageModel?> BuildUserpageModel(int userId);
+    Task<User?> CreateUser(CreateUserModel model);
+    Task<bool> IsUsernameAvailable(string username);
 }
 
 public class AccountService(ILogger<AccountService> logger, DataContext context) : IAccountService
@@ -31,6 +33,7 @@ public class AccountService(ILogger<AccountService> logger, DataContext context)
         if (user.Disabled)
         {
             logger.LogDebug("Cannot log in {username}, account is disabled", username);
+            return null;
         }
 
         if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
@@ -77,6 +80,33 @@ left join comments on comments.site = s.ID
 order by s.ID", new { userId })).ToList();
         return new() { User = user, Counts = counts };
     }
+
+    public async Task<User?> CreateUser(CreateUserModel model)
+    {
+        try
+        {
+            var userRole = context.Roles.FirstAsync(r => r.Name == Role.UserRoleName);
+            var dbModel = new User()
+            {
+                UserName = model.Username ?? string.Empty,
+                EmailAddress = model.Email ?? string.Empty,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                CreatedOn = DateTime.UtcNow,
+                RoleID = userRole.Id
+            };
+
+            await context.Users.AddAsync(dbModel);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Created New User {username}", model.Username);
+            return dbModel;
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning(e, "Failed to create new user");
+            return null;
+        }
+    }
+    public async Task<bool> IsUsernameAvailable(string username) => (await context.Users.CountAsync(u => u.UserName == username)) == 0;
 }
 
 
