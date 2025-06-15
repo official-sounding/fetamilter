@@ -108,33 +108,3 @@ order by s.ID", new { userId })).ToList();
     }
     public async Task<bool> IsUsernameAvailable(string username) => (await context.Users.CountAsync(u => u.UserName == username)) == 0;
 }
-
-
-public class Either<T, Err>
-{
-    private readonly T _left;
-    private readonly Err _right;
-    private readonly bool _isLeft;
-
-    private Either(T left, Err right, bool isLeft)
-    {
-        _left = left;
-        _right = right;
-        _isLeft = isLeft;
-    }
-
-    public static Either<T, Err> FromLeft(T left) => new(left, default!, true);
-    public static Either<T, Err> FromRight(Err right) => new(default!, right, false);
-
-    public R HandleResult<R>(Func<T, R> forLeft, Func<Err, R> forRight)
-    {
-        if (_isLeft)
-        {
-            return forLeft(_left);
-        }
-        else
-        {
-            return forRight(_right);
-        }
-    }
-}
