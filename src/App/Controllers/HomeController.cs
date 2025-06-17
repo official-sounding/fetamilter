@@ -11,7 +11,7 @@ using App.Services;
 
 namespace App.Controllers;
 
-public class HomeController(ISiteService siteService, DataContext context, ILogger<HomeController> logger) : ControllerBase(siteService)
+public class HomeController(ISiteService siteService, IPostService postService, DataContext context, ILogger<HomeController> logger) : ControllerBase(siteService)
 {
     private const int PageSize = 25;
     public async Task<IActionResult> Index(int? pageNumber = 0, CancellationToken ct = default)
@@ -24,7 +24,7 @@ public class HomeController(ISiteService siteService, DataContext context, ILogg
         return View(new HomepageModel()
         {
             Site = SubSite,
-            Posts = await PaginatedList<HomepageModel.PostModel>.CreateAsync(posts.AsNoTracking().Select(p => new HomepageModel.PostModel(p, p.Comments.Count(), 0)), pageNumber ?? 1, PageSize)
+            Posts = await PaginatedList<HomepageModel.PostModel>.CreateAsync(posts.AsNoTracking().Select(p => new HomepageModel.PostModel(p, p.Comments.Count(), p.Favorites.Count())), pageNumber ?? 1, PageSize)
         });
     }
 
@@ -64,22 +64,61 @@ public class HomeController(ISiteService siteService, DataContext context, ILogg
     [HttpGet("{postNum:int}")]
     public async Task<IActionResult> Post(int postNum, [FromQuery] string? commentError = null)
     {
-        var post = await context.Posts
-            .Where(p => p.Number == postNum)
-            .Where(p => p.SiteID == SubSite.ID)
-            .Include(p => p.Site)
-            .Include(p => p.PostedBy)
-            .OrderBy(p => p.ID)
-            .FirstOrDefaultAsync();
+        var post = await postService.PostBySiteAndNumber(SubSite, postNum, true);
 
         if (post is null)
         {
             return NotFound();
         }
 
-        await context.Comments.Where(c => c.Post.ID == post.ID).Include(c => c.PostedBy).LoadAsync();
-
         return View(new PostpageModel() { Post = post, CommentError = commentError });
+    }
+
+    [HttpPost("{postNum:int}/favorite")]
+    [Authorize(Policy = Policy.MakePost)]
+    public async Task<IActionResult> AddFavorite(int postNum)
+    {
+        var post = await postService.PostBySiteAndNumber(SubSite, postNum);
+        if (post is null)
+        {
+            return NotFound();
+        }
+
+        var successful = false;
+        if ((await context.PostFavorites.CountAsync(pf => pf.PostID == post.ID && pf.UserID == User.GetUserId())) == 0)
+        {
+            context.PostFavorites.Add(new PostFavorite() { PostID = post.ID, UserID = User.GetUserId() });
+            await context.SaveChangesAsync();
+            successful = true;
+        }
+
+        var currentCount = await context.PostFavorites.CountAsync(pf => pf.PostID == post.ID);
+
+        return Json(new FavoriteModel() { CurrentCount = currentCount, ActionSuccessful = successful });
+    }
+
+    [HttpDelete("{postNum:int}/favorite")]
+    [Authorize(Policy = Policy.MakePost)]
+    public async Task<IActionResult> DeleteFavorite(int postNum)
+    {
+        var post = await postService.PostBySiteAndNumber(SubSite, postNum);
+        if (post is null)
+        {
+            return NotFound();
+        }
+
+        var pf = await context.PostFavorites.Where(pf => pf.PostID == post.ID && pf.UserID == User.GetUserId()).SingleOrDefaultAsync();
+
+        var successful = false;
+        if (pf != null)
+        {
+            context.PostFavorites.Remove(pf);
+            await context.SaveChangesAsync();
+            successful = true;
+        }
+
+        var currentCount = await context.PostFavorites.CountAsync(pf => pf.PostID == post.ID);
+        return Json(new FavoriteModel() { CurrentCount = currentCount, ActionSuccessful = successful });
     }
 
     [HttpPost("{postNum:int}/comment")]
@@ -90,11 +129,8 @@ public class HomeController(ISiteService siteService, DataContext context, ILogg
         {
             return RedirectToAction(nameof(Post), new { postNum, commentError = "cannot post an empty comment" });
         }
-        var post = await context.Posts
-                    .Where(p => p.Number == postNum)
-                    .Where(p => p.SiteID == SubSite.ID)
-                    .OrderBy(p => p.ID)
-                    .FirstOrDefaultAsync();
+
+        var post = await postService.PostBySiteAndNumber(SubSite, postNum);
 
         if (post is null)
         {

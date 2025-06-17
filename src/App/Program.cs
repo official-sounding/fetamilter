@@ -19,6 +19,7 @@ var mvcbuilder = builder.Services.AddControllersWithViews();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddSingleton<ISiteService, SiteService>();
 builder.Services.AddTransient<IAccountService, AccountService>();
+builder.Services.AddTransient<IPostService, PostService>();
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>

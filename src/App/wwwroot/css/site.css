@@ -53,3 +53,7 @@ form .form-input textarea {
 form button[type="submit"] {
     margin-left: 7rem;
 }
+
+post-favorite-button {
+    --link-color: blue;
+}

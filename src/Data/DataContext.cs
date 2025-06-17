@@ -12,6 +12,8 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Role> Roles { get; set; }
     public DbSet<Comment> Comments { get; set; }
 
+    public DbSet<PostFavorite> PostFavorites { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Site>()
@@ -26,10 +28,15 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
             .ToTable("Comment");
 
 
-
         modelBuilder.Entity<Post>()
         .ToTable("Post")
         .HasIndex("SiteID", nameof(Post.Number));
+
+        modelBuilder.Entity<PostFavorite>()
+        .ToTable("PostFavorite")
+        .HasIndex((pf) => pf.PostID, "idx_postfavorite_postID");
+
+        modelBuilder.Entity<PostFavorite>().HasIndex((pf) => pf.UserID, "idx_postfavorite_userID");
 
         modelBuilder.Entity<Role>()
             .ToTable("Role");
