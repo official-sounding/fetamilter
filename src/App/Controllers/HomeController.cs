@@ -74,6 +74,20 @@ public class HomeController(ISiteService siteService, IPostService postService, 
         return View(new PostpageModel() { Post = post, CommentError = commentError });
     }
 
+    [HttpGet("{postNum:int}/favorites")]
+    public async Task<IActionResult> PostFavorites(int postNum)
+    {
+        var post = await postService.PostBySiteAndNumber(SubSite, postNum);
+
+        if (post is null)
+        {
+            return NotFound();
+        }
+
+        var favorites = await context.PostFavorites.Where(p => p.PostID == post.ID).Include(pf => pf.User).AsNoTracking().ToListAsync();
+        return View(new PostFavoritesModel() { Favorites = favorites, PostNum = postNum });
+    }
+
     [HttpPost("{postNum:int}/favorite")]
     [Authorize(Policy = Policy.MakePost)]
     public async Task<IActionResult> AddFavorite(int postNum)
@@ -93,7 +107,6 @@ public class HomeController(ISiteService siteService, IPostService postService, 
         }
 
         var currentCount = await context.PostFavorites.CountAsync(pf => pf.PostID == post.ID);
-
         return Json(new FavoriteModel() { CurrentCount = currentCount, ActionSuccessful = successful });
     }
 
