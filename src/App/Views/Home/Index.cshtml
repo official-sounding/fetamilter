@@ -17,8 +17,9 @@
 
                 <a href="/@item.Post.Number">
                     @Html.DisplayFor(_ => item.CommentCount)
-                    @(item.CommentCount == 1 ? "Comment" : "Comments")
-                </a>
+                    @(item.CommentCount == 1 ? "Comment" : "Comments")</a>
+
+                <post-favorite-button post="@item.Post.Number" />
             </div>
         </article>
         <hr />

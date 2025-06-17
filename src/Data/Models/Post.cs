@@ -15,6 +15,7 @@ public class Post
     public DateTime PostedOn { get; set; }
 
     public ICollection<Comment> Comments { get; set; } = [];
+    public ICollection<PostFavorite> Favorites { get; set; } = [];
 
     public string PostedByUsername => PostedBy?.UserName ?? string.Empty;
 

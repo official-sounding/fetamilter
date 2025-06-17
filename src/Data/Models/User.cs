@@ -15,4 +15,5 @@ public class User
     public int RoleID { get; set; }
 
     public ICollection<Post> Posts { get; set; } = [];
+    public ICollection<PostFavorite> PostFavorites { get; set; } = [];
 }
