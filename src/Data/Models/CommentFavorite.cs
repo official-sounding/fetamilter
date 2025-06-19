@@ -7,6 +7,6 @@ public class CommentFavorite()
     public int UserID { get; set; }
     public DateTime FavoritedOn { get; set; }
 
-    public Comment? Comment { get; set; }
-    public User? User { get; set; }
+    public Comment Comment { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

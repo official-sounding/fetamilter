@@ -8,6 +8,6 @@ public class PostFavorite()
     public DateTime FavoritedOn { get; set; }
 
 
-    public Post? Post { get; set; }
-    public User? User { get; set; }
+    public Post Post { get; set; } = null!;
+    public User User { get; set; } = null!;
 }
