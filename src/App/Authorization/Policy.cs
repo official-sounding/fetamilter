@@ -11,6 +11,7 @@ public class Policy
     public const string DeleteComment = "delete_comment";
     public const string DisableUser = "disable_user";
     public const string ViewFlags = "view_flags";
+    public const string TagManagement = "tag_management";
     public const string PostOfficially = "post_officially";
 
     public static readonly string[] AllPolicies = [
@@ -20,6 +21,7 @@ public class Policy
         DeleteComment,
         DisableUser,
         ViewFlags,
+        TagManagement,
         PostOfficially
     ];
 }

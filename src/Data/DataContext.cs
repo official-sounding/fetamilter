@@ -11,6 +11,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Site> Sites { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<Comment> Comments { get; set; }
+    public DbSet<Tag> Tags { get; set; }
 
     public DbSet<PostFavorite> PostFavorites { get; set; }
     public DbSet<CommentFavorite> CommentFavorites { get; set; }
@@ -39,6 +40,9 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         modelBuilder.Entity<CommentFavorite>()
         .ToTable("CommentFavorite");
 
+        modelBuilder.Entity<Tag>()
+        .ToTable("Tag");
+
 
         modelBuilder.Entity<Role>()
             .ToTable("Role");
@@ -46,6 +50,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         if (Database.IsSqlite())
         {
             modelBuilder.Entity<User>().Property((u) => u.UserName).UseCollation("NOCASE");
+            modelBuilder.Entity<Tag>().Property(t => t.Name).UseCollation("NOCASE");
         }
     }
 
