@@ -11,7 +11,7 @@ public class User
     public string? Bio { get; set; }
     public DateTime CreatedOn { get; set; }
 
-    public Role? Role { get; set; }
+    public Role Role { get; set; } = null!;
     public int RoleID { get; set; }
 
     public ICollection<Post> Posts { get; set; } = [];
