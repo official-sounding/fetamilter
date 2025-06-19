@@ -1,11 +1,11 @@
-@model App.Models.PostFavoritesModel
+@model App.Models.FavoriteDetailModel
 
 <div class="content">
     <h2>@Model.Favorites.Count users marked this as a favorite</h2>
     <h3><post-favorite-button post="@Model.PostNum" full-text="true"></post-favorite-button></h3>
     <ul>
         @foreach(var favorite in Model.Favorites) {
-            <li><a href="/user/@favorite.UserID">@favorite.User?.UserName</a></li>
+            <li><a href="/user/@favorite.UserID">@favorite.Username</a><span>@Html.DisplayFor((_) => favorite.FavoritedOn)</span></li>
         }
     </ul>
 

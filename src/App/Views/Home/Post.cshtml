@@ -22,7 +22,10 @@
         <div class="logline">
             Posted by <a href="/user/@Model.Post.PostedByID">@Html.DisplayFor(m => m.Post.PostedByUsername)</a>
             (@Model.Post.Comments.Count comments total)
-            <post-favorite-button post="@Model.Post.Number" full-text="true"></post-favorite-button>
+            @if ((await AuthorizationService.AuthorizeAsync(User, Policy.MakePost)).Succeeded) {
+                <post-favorite-button post="@Model.Post.Number" full-text="true"></post-favorite-button>
+            }
+            
             @if (@Model.Post.Favorites.Count > 0) {
                 <a href="/@Model.Post.Number/favorites">@Model.Post.Favorites.Count users marked this as a favorite</a>
             } 
@@ -37,6 +40,11 @@
                 <div class="logline">
                     Posted by <a href="/user/@comment.PostedByID">@Html.DisplayFor(_ => comment.PostedBy.UserName)</a>
                     on @Html.DisplayFor(_ => comment.PostedOn)
+                    @if ((await AuthorizationService.AuthorizeAsync(User, Policy.MakeComment)).Succeeded) {
+                        <comment-favorite-button post="@Model.Post.Number" comment="@comment.ID" initial="@comment.Favorites.Count" />
+                    } else if(@comment.Favorites.Count > 0) {
+                        <a href="/@Model.Post.Number/@comment.ID/favorites">@comment.Favorites.Count Favorites</a>
+                    }
                 </div>
             </div>
         }
