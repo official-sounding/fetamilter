@@ -1,4 +1,5 @@
-﻿@model App.Models.HomepageModel;
+﻿@using App.Authorization
+@model App.Models.HomepageModel;
 @{
     ViewData["Title"] = $"{Model.Site.Title} - Homepage";
 }
@@ -18,8 +19,9 @@
                 <a href="/@item.Post.Number">
                     @Html.DisplayFor(_ => item.CommentCount)
                     @(item.CommentCount == 1 ? "Comment" : "Comments")</a>
-
-                <post-favorite-button post="@item.Post.Number" />
+                @if ((await AuthorizationService.AuthorizeAsync(User, Policy.MakePost)).Succeeded) {
+                    <post-favorite-button post="@item.Post.Number" />
+                }
             </div>
         </article>
         <hr />

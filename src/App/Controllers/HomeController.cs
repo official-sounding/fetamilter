@@ -75,7 +75,7 @@ public class HomeController(ISiteService siteService, IPostService postService, 
     }
 
     [HttpGet("{postNum:int}/favorites")]
-    public async Task<IActionResult> PostFavorites(int postNum)
+    public async Task<IActionResult> FavoriteDetails(int postNum)
     {
         var post = await postService.PostBySiteAndNumber(SubSite, postNum);
 
@@ -84,8 +84,32 @@ public class HomeController(ISiteService siteService, IPostService postService, 
             return NotFound();
         }
 
-        var favorites = await context.PostFavorites.Where(p => p.PostID == post.ID).Include(pf => pf.User).AsNoTracking().ToListAsync();
-        return View(new PostFavoritesModel() { Favorites = favorites, PostNum = postNum });
+        var favorites = await context.PostFavorites
+        .Where(p => p.PostID == post.ID)
+        //.Include(pf => pf.User)
+        .Select(pf => new FavoriteDetail(pf.UserID, pf.User!.UserName, pf.FavoritedOn))
+        .ToListAsync();
+
+        return View(new FavoriteDetailModel() { Favorites = favorites, PostNum = postNum });
+    }
+
+    [HttpGet("{postNum:int}/{commentId:int}/favorites")]
+    public async Task<IActionResult> FavoriteDetails(int postNum, int commentId)
+    {
+        var post = await postService.PostBySiteAndNumber(SubSite, postNum);
+
+        if (post is null)
+        {
+            return NotFound();
+        }
+
+        var favorites = await context.CommentFavorites
+        .Where(p => p.CommentID == post.ID)
+        //.Include(pf => pf.User)
+        .Select(pf => new FavoriteDetail(pf.UserID, pf.User!.UserName, pf.FavoritedOn))
+        .ToListAsync();
+
+        return View(new FavoriteDetailModel() { Favorites = favorites, PostNum = postNum, CommentId = commentId });
     }
 
     [HttpPost("{postNum:int}/favorite")]
@@ -101,7 +125,7 @@ public class HomeController(ISiteService siteService, IPostService postService, 
         var successful = false;
         if ((await context.PostFavorites.CountAsync(pf => pf.PostID == post.ID && pf.UserID == User.GetUserId())) == 0)
         {
-            context.PostFavorites.Add(new PostFavorite() { PostID = post.ID, UserID = User.GetUserId() });
+            context.PostFavorites.Add(new PostFavorite() { PostID = post.ID, UserID = User.GetUserId(), FavoritedOn = DateTime.UtcNow });
             await context.SaveChangesAsync();
             successful = true;
         }
@@ -131,6 +155,52 @@ public class HomeController(ISiteService siteService, IPostService postService, 
         }
 
         var currentCount = await context.PostFavorites.CountAsync(pf => pf.PostID == post.ID);
+        return Json(new FavoriteModel() { CurrentCount = currentCount, ActionSuccessful = successful });
+    }
+
+    [HttpPost("{postNum:int}/{commentId:int}/favorite")]
+    [Authorize(Policy = Policy.MakePost)]
+    public async Task<IActionResult> AddCommentFavorite(int postNum, int commentId)
+    {
+        var post = await postService.PostBySiteAndNumber(SubSite, postNum);
+        if (post is null)
+        {
+            return NotFound();
+        }
+
+        var successful = false;
+        if ((await context.CommentFavorites.CountAsync(pf => pf.CommentID == commentId && pf.UserID == User.GetUserId())) == 0)
+        {
+            context.CommentFavorites.Add(new CommentFavorite() { CommentID = commentId, UserID = User.GetUserId(), FavoritedOn = DateTime.UtcNow });
+            await context.SaveChangesAsync();
+            successful = true;
+        }
+
+        var currentCount = await context.CommentFavorites.CountAsync(pf => pf.CommentID == commentId);
+        return Json(new FavoriteModel() { CurrentCount = currentCount, ActionSuccessful = successful });
+    }
+
+    [HttpDelete("{postNum:int}/{commentId:int}/favorite")]
+    [Authorize(Policy = Policy.MakePost)]
+    public async Task<IActionResult> DeleteCommentFavorite(int postNum, int commentId)
+    {
+        var post = await postService.PostBySiteAndNumber(SubSite, postNum);
+        if (post is null)
+        {
+            return NotFound();
+        }
+
+        var pf = await context.CommentFavorites.Where(pf => pf.CommentID == commentId && pf.UserID == User.GetUserId()).SingleOrDefaultAsync();
+
+        var successful = false;
+        if (pf != null)
+        {
+            context.CommentFavorites.Remove(pf);
+            await context.SaveChangesAsync();
+            successful = true;
+        }
+
+        var currentCount = await context.CommentFavorites.CountAsync(pf => pf.CommentID == commentId);
         return Json(new FavoriteModel() { CurrentCount = currentCount, ActionSuccessful = successful });
     }
 
