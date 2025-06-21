@@ -1,0 +1,42 @@
+@using App.Authorization
+@model App.Models.HomepageModel;
+@{
+    ViewData["Title"] = $"{Model.Site.Title} - Homepage";
+}
+
+<h1>Posts tagged @(ViewContext.RouteData.Values["tagName"])</h1>
+<div class="content">
+    @foreach (var item in Model.Posts)
+    {
+        <article>
+            <div class="post">
+                <h2><a href="/@item.Post.Number">@Html.DisplayFor(_ => item.Post.Title)</a></h2>
+                <p>@Html.DisplayFor(_ => item.Post.Body)</p>
+            </div>
+            <div class="logline">
+                Posted by <a href="/user/@item.Post.PostedByID">@Html.DisplayFor(_ => item.Post.PostedByUsername)</a>
+                on @Html.DisplayFor(_ => item.Post.PostedOn)
+
+                <a href="/@item.Post.Number">
+                    @Html.DisplayFor(_ => item.CommentCount)
+                    @(item.CommentCount == 1 ? "Comment" : "Comments")</a>
+                @if ((await AuthorizationService.AuthorizeAsync(User, Policy.MakePost)).Succeeded) {
+                    <post-favorite-button post="@item.Post.Number" />
+                }
+            </div>
+        </article>
+        <hr />
+    }
+</div>
+
+<div>
+    @if (Model.Posts.HasPreviousPage)
+    {
+        <a href="#">&lt; Prev Page</a>
+    }
+
+    @if (Model.Posts.HasNextPage)
+    {
+        <a href="#">Next Page &gt;</a>
+    }
+</div>
