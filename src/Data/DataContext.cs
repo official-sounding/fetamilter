@@ -41,7 +41,8 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         .ToTable("CommentFavorite");
 
         modelBuilder.Entity<Tag>()
-        .ToTable("Tag");
+        .ToTable("Tag")
+        .HasIndex((t) => t.Name, "idx_tag_name").IsUnique();
 
 
         modelBuilder.Entity<Role>()

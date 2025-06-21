@@ -13,7 +13,6 @@ namespace App.Controllers;
 
 public class HomeController(ISiteService siteService, IPostService postService, DataContext context, ILogger<HomeController> logger) : ControllerBase(siteService)
 {
-    private const int PageSize = 25;
     public async Task<IActionResult> Index(int? pageNumber = 0, CancellationToken ct = default)
     {
         logger.BeginScope(SiteSlug);
