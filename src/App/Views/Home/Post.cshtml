@@ -6,6 +6,17 @@
 }
 
 <div class="content">
+        @if(Model.Post.Tags?.Count > 0) {
+    <aside id="tags">
+        <h3>Tags</h3>
+        <ul>
+            @foreach(var tag in Model.Post.Tags) {
+                <li>@tag.Name</li>
+            }
+        </ul>
+    </aside>
+    
+    }
     <article>
         <h2>@Html.DisplayFor(m => m.Post.Title)</h2>
         <h3>@Html.DisplayFor(m => m.Post.PostedOn)</h3>
@@ -31,6 +42,7 @@
             } 
         </div>
     </article>
+
 
     <div id="comments">
         @foreach (var comment in Model.Post.Comments)

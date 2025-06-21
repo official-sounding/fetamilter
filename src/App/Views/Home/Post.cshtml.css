@@ -21,3 +21,17 @@ article .logline {
     padding: 0.2rem 0.1rem;
     font-size: 0.8rem;
 }
+
+#tags {
+    float: right;
+    clear: both;
+    /* margin-top: 24px; */
+    background-color: #e0e0e0;
+    padding: 1rem;
+    width: 20ch;
+}
+
+#tags ul {
+    list-style: none;
+    padding: 0;
+}

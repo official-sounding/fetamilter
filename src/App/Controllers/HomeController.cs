@@ -42,7 +42,7 @@ public class HomeController(ISiteService siteService, IPostService postService, 
 
         if (ModelState.IsValid)
         {
-
+            var tags = string.IsNullOrWhiteSpace(post.TagList) ? [] : await postService.TagsFromString(post.TagList);
             var dbModel = new Post()
             {
                 Body = post.Body ?? string.Empty,
@@ -50,7 +50,8 @@ public class HomeController(ISiteService siteService, IPostService postService, 
                 MoreInside = post.MoreInside,
                 SiteID = SubSite.ID,
                 PostedByID = User.GetUserId(),
-                PostedOn = DateTime.UtcNow
+                PostedOn = DateTime.UtcNow,
+                Tags = [.. tags]
             };
 
             context.Posts.Add(dbModel);

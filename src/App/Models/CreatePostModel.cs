@@ -12,4 +12,6 @@ public class CreatePostModel
     public string? Body { get; set; }
 
     public string? MoreInside { get; set; }
+    [StringLength(200)]
+    public string? TagList { get; set; }
 }
