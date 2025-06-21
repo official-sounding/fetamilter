@@ -1,11 +1,15 @@
+@using Microsoft.AspNetCore.Mvc.ModelBinding
 @model App.Models.CreatePostModel
 
 <form action="/create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-input">
                 <label asp-for="Title" class="control-label">Title</label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <input asp-for="Title" class="form-control" 
+                aria-describedby="title-validation"
+                aria-invalid="@(ViewData.ModelState.GetValidationState("Title") == ModelValidationState.Invalid ? "true" : "false")"
+                />
+                <span asp-validation-for="Title" class="text-danger" id="title-validation"></span>
             </div>
             <div class="form-input">
                 <label asp-for="Body" class="control-label">Body</label>
@@ -16,6 +20,14 @@
                 <label asp-for="MoreInside" class="control-label">More Inside</label>
                 <textarea asp-for="MoreInside" class="form-control" ></textarea>
                 <span asp-validation-for="MoreInside" class="text-danger"></span>
+            </div>
+            <div class="form-input"></div>
+                <label asp-for="TagList" class="control-label">Tags</label>
+                <input asp-for="TagList" class="form-control" 
+                aria-describedby="tags-help tags-validation"
+                aria-invalid="@(ViewData.ModelState.GetValidationState("TagList") == ModelValidationState.Invalid ? "true" : "false")"></textarea>
+                <span asp-validation-for="TagList" class="text-danger" id="tags-validation"></span>
+                <span id="tags-help"></span>
             </div>
             <button type="submit">Create Post</button>
 </form>
