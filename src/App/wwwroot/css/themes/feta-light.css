@@ -1,0 +1,10 @@
+:root {
+    --text-color: #111;
+    --bg-color: #fff;
+    --link-color: blue;
+    --link-alt-color: darkviolet;
+    --header-bg-color: #069;
+    --header-fg-color: #fff;
+    --header-link-color: #cc0;
+    --header-link-alt-color: #cc9;
+}

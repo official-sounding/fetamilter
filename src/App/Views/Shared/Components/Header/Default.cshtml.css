@@ -1,23 +1,51 @@
-header {
-    position: sticky;
-    top: 0;
-    background-color: lightcyan;
+header,
+nav {
+    background-color: var(--header-bg-color, lightcyan);
+    color: var(--header-fg-color, initial);
 }
 
-header nav {
+header {
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    padding: .5rem 0;
+    padding-top: 0.5rem;
 }
 
-.site-title {
+nav {
+    padding: 0.5rem 0;
+    font-size: 0.8rem;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     margin-left: 3rem;
-    font-size: 1.5rem;
+}
+
+nav ul li {
+    display: inline-block;
+}
+
+nav ul li + li {
+    margin-left: 0.5rem;
+}
+
+h1 {
+    margin-left: 3rem;
 }
 
 .user-details {
+    font-size: 0.8rem;
     margin-right: 3rem;
-    font-size: 1.25rem;
+}
+
+a,
+a:visited {
+    color: var(--header-link-color, inherit);
+}
+
+a:hover {
+    color: var(--header-link-alt-color, inherit);
 }
