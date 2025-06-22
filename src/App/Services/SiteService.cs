@@ -1,23 +1,46 @@
 using System.Collections.Immutable;
+using App.Config;
+using App.Models;
 using Data;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace App.Services;
 
 public interface ISiteService
 {
-    Site SiteBySlug(string slug);
+    IEnumerable<SiteViewModel> AllSites();
+    SiteViewModel SiteBySlug(string slug);
 }
 
-public class SiteService(IServiceProvider svcs) : ISiteService
+public class SiteService(IServiceProvider svcs, IOptions<SiteConfig> siteConfig) : ISiteService
 {
     private readonly Lock _lockObj = new();
     private ImmutableDictionary<string, Site> _siteBySlug = ImmutableDictionary<string, Site>.Empty;
 
     private bool _initialized = false;
 
-    public Site SiteBySlug(string slug)
+    public SiteViewModel SiteBySlug(string slug)
+    {
+        InitializeDictionary();
+        if (_siteBySlug.TryGetValue(slug, out var site) || _siteBySlug.TryGetValue("www", out site))
+        {
+            return SiteViewModel.BuildViewModel(site, siteConfig.Value);
+        }
+
+        throw new Exception("Sites Table is not initialized");
+    }
+
+    public IEnumerable<SiteViewModel> AllSites()
+    {
+        InitializeDictionary();
+        return _siteBySlug.Values
+            .OrderByDescending(s => s.Order)
+            .Select(s => SiteViewModel.BuildViewModel(s, siteConfig.Value));
+    }
+
+    private void InitializeDictionary()
     {
         if (!_initialized)
         {
@@ -25,25 +48,13 @@ public class SiteService(IServiceProvider svcs) : ISiteService
             {
                 if (!_initialized)
                 {
-                    InitializeDictionary();
+                    using var scope = svcs.CreateScope();
+                    var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+                    var sites = context.Sites.AsNoTracking().ToList();
+                    _siteBySlug = sites.ToImmutableDictionary(s => s.Slug);
+                    _initialized = true;
                 }
             }
         }
-
-        if (_siteBySlug.TryGetValue(slug, out var site) || _siteBySlug.TryGetValue("www", out site))
-        {
-            return site;
-        }
-
-        throw new Exception("Sites Table is not initialized");
-    }
-
-    private void InitializeDictionary()
-    {
-        using var scope = svcs.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-        var sites = context.Sites.AsNoTracking().ToList();
-        _siteBySlug = sites.ToDictionary(s => s.Slug).ToImmutableDictionary();
-        _initialized = true;
     }
 }

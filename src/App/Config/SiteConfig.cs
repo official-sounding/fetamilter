@@ -4,4 +4,5 @@ public class SiteConfig
 {
     public const string SECTION = "Site";
     public string? RootDomain { get; set; }
+    public bool UseHttps { get; set; }
 }

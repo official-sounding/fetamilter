@@ -4,15 +4,16 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - FetaMilter</title>
+    <title>@ViewData["SiteTitle"] - @ViewData["Title"]</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/App.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/themes/feta-light.css" asp-append-version="true" />
+    <link rel="stylesheet" href="@((ViewData["Site"] as SiteViewModel)!.ThemeCssPath)-light.css" asp-asp-append-version="true" />
+    @await RenderSectionAsync("Theme", required: false)
 </head>
 
 <body>
-    <vc:header></vc:header>
+    @(await Html.PartialAsync("Header.cshtml"))
     <main role="main">
         @RenderBody()
     </main>

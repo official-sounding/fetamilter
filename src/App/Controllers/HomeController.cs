@@ -22,11 +22,10 @@ public class HomeController(ISiteService siteService, IPostService postService, 
         logger.BeginScope(SiteSlug);
         logger.LogDebug("Load Homepage for {SubSite}", SiteSlug);
 
-        var posts = context.Posts.Where(p => p.Site == SubSite).Include(p => p.PostedBy).OrderByDescending(p => p.PostedOn);
+        var posts = context.Posts.Where(p => p.Site.ID == SubSite.ID).Include(p => p.PostedBy).OrderByDescending(p => p.PostedOn);
 
         return View(new HomepageModel()
         {
-            Site = SubSite,
             Posts = await PaginatedList<HomepageModel.PostModel>.CreateAsync(posts.AsNoTracking().Select(p => new HomepageModel.PostModel(p, p.Comments.Count(), p.Favorites.Count())), pageNumber ?? 1, PageSize)
         });
     }
