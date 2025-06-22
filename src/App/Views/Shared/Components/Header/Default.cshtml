@@ -1,19 +1,24 @@
 @model App.Models.HeaderModel;
 
 <header>
-    <nav>
         <div class="site-title">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@Model.Site.Title</a>
+            <h1>@Model.Site.Title</h1>
         </div>
         <div class="user-details">
             @if (Model.IsLoggedIn)
             {
-                @Html.DisplayFor(m => m.Username)
+                @Html.DisplayFor(m => m.Username) @Html.Raw(" |") <a href="/logout">Logout</a>
             }
             else
             {
                 <a href="/login">Login</a>
             }
         </div>
-    </nav>
 </header>
+    <nav>
+        <ul>
+            <li><a href="#">Fetamilter</a></li>
+            <li><a href="#">AskFeta</a></li>
+            <li><a href="#">FetaTalk</a></li>
+        </ul>
+    </nav>
