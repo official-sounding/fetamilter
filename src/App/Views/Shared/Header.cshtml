@@ -1,0 +1,30 @@
+@{
+    var currentSite = ViewData["Site"] as SiteViewModel;
+    var sites = ViewData["Sites"] as SiteViewModel[];
+    var isLoggedIn = (ViewData["isLoggedIn"] as bool?) ?? false;
+    var username = ViewData["Username"]?.ToString();
+
+}
+<header>
+        <div class="site-title">
+            <h1>@currentSite?.Title</h1>
+        </div>
+        <div class="user-details">
+            @if (isLoggedIn)
+            {
+                @Html.DisplayFor(m => username) @Html.Raw(" |") <a href="/logout">Logout</a>
+            }
+            else
+            {
+                <a href="/login">Login</a>
+            }
+        </div>
+</header>
+    <nav>
+        <ul>
+            @foreach(var site in sites ?? []) 
+            {
+                <li><a href="@site.Url">@site.Title</a></li>
+            }
+        </ul>
+    </nav>

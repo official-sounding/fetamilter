@@ -1,7 +1,9 @@
 @using App.Authorization
 @model App.Models.HomepageModel;
+
 @{
-    ViewData["Title"] = $"{Model.Site.Title} - Homepage";
+    var tagName = ViewContext.RouteData.Values["tagName"];
+    ViewData["Title"] = $"Posts tagged {tagName}";
 }
 
 <h1>Posts tagged @(ViewContext.RouteData.Values["tagName"])</h1>

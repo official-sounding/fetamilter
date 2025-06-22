@@ -21,7 +21,6 @@ public class TagController(ISiteService siteService, DataContext context) : Cont
 
         return View(new HomepageModel()
         {
-            Site = SubSite,
             Posts = await PaginatedList<HomepageModel.PostModel>.CreateAsync(posts.AsNoTracking().Select(p => new HomepageModel.PostModel(p, p.Comments.Count(), p.Favorites.Count())), pageNumber ?? 1, PageSize)
         });
     }

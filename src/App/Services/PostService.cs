@@ -1,3 +1,4 @@
+using App.Models;
 using Data;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
@@ -6,13 +7,13 @@ namespace App.Services;
 
 public interface IPostService
 {
-    Task<Post?> PostBySiteAndNumber(Site site, int postNum, bool includeDetails = false);
+    Task<Post?> PostBySiteAndNumber(SiteViewModel site, int postNum, bool includeDetails = false);
     Task<IEnumerable<Tag>> TagsFromString(string tagStr);
 }
 
 public class PostService(DataContext context) : IPostService
 {
-    public async Task<Post?> PostBySiteAndNumber(Site site, int postNum, bool includeDetails = false)
+    public async Task<Post?> PostBySiteAndNumber(SiteViewModel site, int postNum, bool includeDetails = false)
     {
         var query = context.Posts
             .Where(p => p.Number == postNum)

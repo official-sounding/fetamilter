@@ -15,9 +15,9 @@ public static class DbInitializer
         if (!ctx.Sites.Any())
         {
             sites = [
-                new() { Slug = "www", Title = "FetaMilter" },
-                new() { Slug = "ask", Title = "AskFeta" },
-                new() { Slug = "meta", Title = "FetaTalk" }
+                new() { Slug = "www", Title = "FetaMilter", Order = 1 },
+                new() { Slug = "ask", Title = "AskFeta", Order = 2 },
+                new() { Slug = "meta", Title = "FetaTalk" , Order = 3}
             ];
 
             roles = [
