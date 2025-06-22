@@ -8,6 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 using App.Authorization;
 using System.Web;
 using App.Services;
+using System.ServiceModel.Syndication;
+using System;
+using System.Xml;
+using System.Text;
 
 namespace App.Controllers;
 
@@ -73,6 +77,49 @@ public class HomeController(ISiteService siteService, IPostService postService, 
 
         return View(new PostpageModel() { Post = post, CommentError = commentError });
     }
+
+    [HttpGet("{postNum:int}/rss")]
+    [ResponseCache(Duration = 1200)]
+    public async Task<IActionResult> PostRss(int postNum)
+    {
+        var post = await postService.PostBySiteAndNumber(SubSite, postNum, true);
+
+        if (post is null)
+        {
+            return NotFound();
+        }
+
+
+        var feed = new SyndicationFeed(post.Title, $"Comments on Post {postNum}", new Uri("https://example.com"), "RSSUrl", DateTime.Now);
+
+        var items = new List<SyndicationItem>();
+        foreach (var item in post.Comments)
+        {
+            var postUrl = new Uri($"{Url.Action(nameof(Post), "Home", new { postNum }, HttpContext.Request.Scheme)}#{item.ID}");
+            var title = $"By {item.PostedBy.UserName}";
+            var description = item.Body;
+            items.Add(new SyndicationItem(title, description, postUrl, $"{SubSite.Slug}-comment-{item.ID}", item.PostedOn));
+        }
+        feed.Items = items;
+
+        var settings = new XmlWriterSettings
+        {
+            Encoding = Encoding.UTF8,
+            NewLineHandling = NewLineHandling.Entitize,
+            NewLineOnAttributes = true,
+            Indent = true,
+        };
+        using var stream = new MemoryStream();
+        using var xmlWriter = XmlWriter.Create(stream, settings);
+
+        var rssFormatter = new Rss20FeedFormatter(feed, false);
+        rssFormatter.WriteTo(xmlWriter);
+        xmlWriter.Flush();
+
+        return File(stream.ToArray(), "application/rss+xml; charset=utf-8");
+
+    }
+
 
     [HttpGet("{postNum:int}/favorites")]
     public async Task<IActionResult> FavoriteDetails(int postNum)
