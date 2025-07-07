@@ -26,6 +26,18 @@ public class UserController(ILogger<UserController> logger, ISiteService siteSer
         return View(user);
     }
 
+    [HttpGet("activity/{id:int}/posts/{slug?}")]
+    public async Task<IActionResult> PostActivity(int id, string? slug = null, [FromQuery] int page = 1)
+    {
+        var user = await accountService.BuildPostActivityModel(id, slug, page);
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        return View(user);
+    }
+
     [HttpGet("login")]
     public IActionResult Login([FromQuery] string? returnUrl = null)
     {

@@ -17,16 +17,16 @@ namespace App.Controllers;
 
 public class HomeController(ISiteService siteService, IPostService postService, DataContext context, ILogger<HomeController> logger) : ControllerBase(siteService)
 {
-    public async Task<IActionResult> Index(int? pageNumber = 0, CancellationToken ct = default)
+    public async Task<IActionResult> Index(int pageNumber = 1, CancellationToken ct = default)
     {
         logger.BeginScope(SiteSlug);
         logger.LogDebug("Load Homepage for {SubSite}", SiteSlug);
 
-        var posts = context.Posts.Where(p => p.Site.ID == SubSite.ID).Include(p => p.PostedBy).OrderByDescending(p => p.PostedOn);
+        var posts = context.Posts.Where(p => p.Site.ID == SubSite.ID);
 
         return View(new HomepageModel()
         {
-            Posts = await PaginatedList<HomepageModel.PostModel>.CreateAsync(posts.AsNoTracking().Select(p => new HomepageModel.PostModel(p, p.Comments.Count(), p.Favorites.Count())), pageNumber ?? 1, PageSize)
+            Posts = await PostModel.BuildPostList(posts, pageNumber)
         });
     }
 

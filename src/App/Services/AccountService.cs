@@ -11,11 +11,12 @@ public interface IAccountService
 {
     Task<User?> AuthenticateUser(string? username, string? password);
     Task<UserpageModel?> BuildUserpageModel(int userId);
+    Task<UserActivityPostModel?> BuildPostActivityModel(int userId, string? slug, int page = 1);
     Task<User?> CreateUser(CreateUserModel model);
     Task<bool> IsUsernameAvailable(string username);
 }
 
-public class AccountService(ILogger<AccountService> logger, DataContext context) : IAccountService
+public class AccountService(ILogger<AccountService> logger, DataContext context, ISiteService siteService) : IAccountService
 {
     public async Task<User?> AuthenticateUser(string? username, string? password)
     {
@@ -42,6 +43,28 @@ public class AccountService(ILogger<AccountService> logger, DataContext context)
             return null;
         }
         return user;
+    }
+
+    public async Task<UserActivityPostModel?> BuildPostActivityModel(int userId, string? slug, int page = 1)
+    {
+        var user = await context.Users.SingleOrDefaultAsync(u => u.ID == userId);
+        var site = slug == null ? null : siteService.SiteBySlug(slug);
+        if (user is null)
+        {
+            return null;
+        }
+
+        var posts = context.Posts
+            .Include(p => p.PostedBy)
+            .Include(p => p.Site)
+            .Where(p => p.PostedByID == userId && (site == null || p.SiteID == site.ID));
+
+        return new UserActivityPostModel()
+        {
+            Site = site,
+            User = user,
+            Posts = await PostModel.BuildPostList(posts, page)
+        };
     }
 
     public async Task<UserpageModel?> BuildUserpageModel(int userId)
@@ -71,7 +94,8 @@ public class AccountService(ILogger<AccountService> logger, DataContext context)
 	group by p.SiteID
 )
 SELECT
-	s.Title as Site,
+	s.Title as site,
+    s.Slug as slug,
 	ifnull(posts.posts, 0) as posts,
 	ifnull(comments.comments, 0) as comments
 from Site s

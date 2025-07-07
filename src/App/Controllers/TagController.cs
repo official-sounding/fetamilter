@@ -2,7 +2,6 @@ using App.Models;
 using App.Services;
 using Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace App.Controllers;
 
@@ -14,14 +13,12 @@ public class TagController(ISiteService siteService, DataContext context) : Cont
     {
         var posts = context.Posts
             .Where(p => p.SiteID == SubSite.ID)
-            .Where(p => p.Tags.Any(t => t.Name == tagName))
-            .Include(p => p.PostedBy)
-            .OrderByDescending(p => p.PostedOn);
+            .Where(p => p.Tags.Any(t => t.Name == tagName));
 
 
         return View(new HomepageModel()
         {
-            Posts = await PaginatedList<HomepageModel.PostModel>.CreateAsync(posts.AsNoTracking().Select(p => new HomepageModel.PostModel(p, p.Comments.Count(), p.Favorites.Count())), pageNumber ?? 1, PageSize)
+            Posts = await PostModel.BuildPostList(posts, pageNumber ?? 1)
         });
     }
 }
