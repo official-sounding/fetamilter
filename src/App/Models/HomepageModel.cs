@@ -1,10 +1,6 @@
-using Data.Models;
-
 namespace App.Models;
 
-public class HomepageModel
+public partial class HomepageModel
 {
     public required PaginatedList<PostModel> Posts { get; init; }
-
-    public record PostModel(Post Post, int CommentCount, int FavoriteCount);
 }

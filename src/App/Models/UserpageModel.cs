@@ -8,4 +8,4 @@ public class UserpageModel
     public required List<UserSiteCount> Counts { get; set; }
 }
 
-public record UserSiteCount(string site, long posts, long comments);
+public record UserSiteCount(string site, string slug, long posts, long comments);
