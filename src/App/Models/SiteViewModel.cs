@@ -21,7 +21,7 @@ public class SiteViewModel
             Title = dbModel.Title,
             Tagline = dbModel.Tagline,
             Slug = dbModel.Slug,
-            Url = $"{scheme}://{dbModel.Slug}.{config.RootDomain}/",
+            Url = config.BuildUri(dbModel.Slug).ToString(),
             ThemeCssPath = $"/css/themes/{dbModel.Slug}",
         };
     }
