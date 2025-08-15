@@ -7,7 +7,7 @@ public static class DbInitializer
 {
     public static async Task Initialize(DataContext ctx, bool generateTestData)
     {
-        await ctx.Database.EnsureCreatedAsync();
+        await ctx.Database.CanConnectAsync();
 
         Site[] sites;
         Role[] roles;
