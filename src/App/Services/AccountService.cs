@@ -4,21 +4,25 @@ using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Dapper;
 using System.Net.Mime;
+using System.Security.Claims;
+using App.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace App.Services;
 
 public interface IAccountService
 {
-    Task<User?> AuthenticateUser(string? username, string? password);
+    Task<bool> AuthenticateUser(string? username, string? password, bool rememberMe);
     Task<UserpageModel?> BuildUserpageModel(int userId);
     Task<UserActivityPostModel?> BuildPostActivityModel(int userId, string? slug, int page = 1);
-    Task<User?> CreateUser(CreateUserModel model);
+    Task<bool> CreateUser(CreateUserModel model);
     Task<bool> IsUsernameAvailable(string username);
 }
 
 public class AccountService(ILogger<AccountService> logger, DataContext context, ISiteService siteService) : IAccountService
 {
-    public async Task<User?> AuthenticateUser(string? username, string? password)
+    public async Task<bool> AuthenticateUser(string? username, string? password, bool rememberMe)
     {
         var user = await context.Users
         .Where(u => u.UserName.Equals(username))
@@ -28,21 +32,22 @@ public class AccountService(ILogger<AccountService> logger, DataContext context,
         if (user is null)
         {
             logger.LogDebug("Cannot log in {username}, User not found", username);
-            return null;
+            return false;
         }
 
         if (user.Disabled)
         {
             logger.LogDebug("Cannot log in {username}, account is disabled", username);
-            return null;
+            return false;
         }
 
         if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
         {
             logger.LogDebug("Cannot log in {username}, password mismatch", username);
-            return null;
+            return false;
         }
-        return user;
+
+        return await SignUserInAsync(user, rememberMe);
     }
 
     public async Task<UserActivityPostModel?> BuildPostActivityModel(int userId, string? slug, int page = 1)
@@ -105,7 +110,7 @@ order by s.ID", new { userId })).ToList();
         return new() { User = user, Counts = counts };
     }
 
-    public async Task<User?> CreateUser(CreateUserModel model)
+    public async Task<bool> CreateUser(CreateUserModel model)
     {
         try
         {
@@ -122,13 +127,67 @@ order by s.ID", new { userId })).ToList();
             await context.Users.AddAsync(dbModel);
             await context.SaveChangesAsync();
             logger.LogInformation("Created New User {username}", model.Username);
-            return dbModel;
+
+            if (dbModel is null)
+            {
+                return false;
+            }
+
+            return await SignUserInAsync(dbModel, true);
         }
         catch (Exception e)
         {
             logger.LogWarning(e, "Failed to create new user");
-            return null;
+            return false;
         }
     }
     public async Task<bool> IsUsernameAvailable(string username) => (await context.Users.CountAsync(u => u.UserName == username)) == 0;
+
+    private async Task<bool> SignUserInAsync(User user, bool rememberMe)
+    {
+        
+        var claims = new List<Claim>
+                {
+                    new(ClaimTypes.Sid, $"{user.ID}"),
+                    new(ClaimTypes.Name, user.UserName),
+                    new(ClaimTypes.Role, Policy.MakeComment),
+                    new(ClaimTypes.Role, Policy.MakePost),
+                };
+
+        if (user.Role?.Name == "Moderator")
+        {
+            claims.AddRange([
+                new(ClaimTypes.Role, Policy.DeletePost),
+                        new(ClaimTypes.Role, Policy.DeleteComment),
+                        new(ClaimTypes.Role, Policy.DisableUser),
+                        new(ClaimTypes.Role, Policy.PostOfficially),
+                        new(ClaimTypes.Role, Policy.ViewFlags)
+            ]);
+        }
+
+        var claimsIdentity = new ClaimsIdentity(
+            claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+        var authProperties = new AuthenticationProperties
+        {
+            IsPersistent = rememberMe,
+            AllowRefresh = true,
+            ExpiresUtc = DateTime.UtcNow.AddDays(365)
+        };
+
+        if (httpContextAccessor.HttpContext is null)
+        {
+            return false;
+        }
+
+        await httpContextAccessor.HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+
+        logger.LogInformation("User {Email} logged in at {Time}.",
+            user.UserName, DateTime.UtcNow);
+
+        return true;
+    }
 }

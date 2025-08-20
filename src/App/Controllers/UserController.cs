@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers;
 
-public class UserController(ILogger<UserController> logger, ISiteService siteService, IAccountService accountService) : ControllerBase(siteService)
+public class UserController(ISiteService siteService, IAccountService accountService) : ControllerBase(siteService)
 {
 
     [HttpGet("user/{id:int}")]
@@ -52,16 +52,17 @@ public class UserController(ILogger<UserController> logger, ISiteService siteSer
             return View(model);
         }
 
-        var user = await accountService.AuthenticateUser(model.Username, model.Password);
-        if (user == null)
-        {
-            // Something failed. Redisplay the form.
-            ModelState.AddModelError(nameof(LoginModel.Username), "Invalid login attempt.");
-            return View(model);
-        }
+        var loggedIn = await accountService.AuthenticateUser(model.Username, model.Password, model.RememberMe);
 
-        await SignUserIn(user, model.RememberMe);
-        return LocalRedirect(model.ReturnUrl ?? "/");
+        if (loggedIn)
+        {
+            return LocalRedirect(model.ReturnUrl ?? "/");
+        }
+        
+
+        // Something failed. Redisplay the form.
+        ModelState.AddModelError(nameof(LoginModel.Username), "Invalid login attempt.");
+        return View(model);
     }
 
 
@@ -96,56 +97,12 @@ public class UserController(ILogger<UserController> logger, ISiteService siteSer
         }
 
         var result = await accountService.CreateUser(user);
-        if (result is null)
+        if (result)
         {
-            ModelState.AddModelError(nameof(CreateUserModel.Username), "Failed to create user");
-            return View(user);
+            return LocalRedirect("/");
         }
 
-
-        await SignUserIn(result, true);
-        return LocalRedirect("/");
-
+        ModelState.AddModelError(nameof(CreateUserModel.Username), "Failed to create user");
+        return View(user);
     }
-
-    private async Task SignUserIn(User user, bool rememberMe)
-    {
-        var claims = new List<Claim>
-                {
-                    new(ClaimTypes.Sid, $"{user.ID}"),
-                    new(ClaimTypes.Name, user.UserName),
-                    new(ClaimTypes.Role, Policy.MakeComment),
-                    new(ClaimTypes.Role, Policy.MakePost),
-                };
-
-        if (user.Role?.Name == "Moderator")
-        {
-            claims.AddRange([
-                new(ClaimTypes.Role, Policy.DeletePost),
-                        new(ClaimTypes.Role, Policy.DeleteComment),
-                        new(ClaimTypes.Role, Policy.DisableUser),
-                        new(ClaimTypes.Role, Policy.PostOfficially),
-                        new(ClaimTypes.Role, Policy.ViewFlags)
-            ]);
-        }
-
-        var claimsIdentity = new ClaimsIdentity(
-            claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-        var authProperties = new AuthenticationProperties
-        {
-            IsPersistent = rememberMe,
-            AllowRefresh = true,
-            ExpiresUtc = DateTime.UtcNow.AddDays(365)
-        };
-
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            new ClaimsPrincipal(claimsIdentity),
-            authProperties);
-
-        logger.LogInformation("User {Email} logged in at {Time}.",
-            user.UserName, DateTime.UtcNow);
-    }
-
 }
