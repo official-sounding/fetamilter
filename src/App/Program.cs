@@ -18,8 +18,14 @@ ArgumentNullException.ThrowIfNull(siteConfig);
 var mvcbuilder = builder.Services.AddControllersWithViews();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddSingleton<ISiteService, SiteService>();
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddTransient<IAccountService, AccountService>();
 builder.Services.AddTransient<IPostService, PostService>();
+builder.Services.AddSingleton<IFavoriteFacade, PostFavoriteFacade>();
+builder.Services.AddSingleton<IFavoriteFacade, CommentFavoriteFacade>();
+builder.Services.AddSingleton<IFavoriteService, FavroiteService>();
+
+
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>
