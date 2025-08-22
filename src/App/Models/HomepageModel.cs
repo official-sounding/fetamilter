@@ -1,6 +1,6 @@
 namespace App.Models;
 
-public partial class HomepageModel
+public class PostListModel
 {
     public required PaginatedList<PostModel> Posts { get; init; }
 }

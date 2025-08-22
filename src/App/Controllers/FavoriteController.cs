@@ -6,20 +6,8 @@ using App.Services;
 
 namespace App.Controllers;
 
-public class FavoriteController(ISiteService siteService, IPostService postService, IFavoriteService favoriteService) : ControllerBase(siteService)
+public class FavoriteController(ISiteService siteService, IPostService postService, IFavoriteService favoriteService) : ControllerBase(siteService, postService)
 {
-    private async Task<IActionResult> WithPost(int postNum, Func<Post, Task<IActionResult>> fn)
-    {
-        var post = await postService.PostBySiteAndNumber(SubSite, postNum);
-
-        if (post is null)
-        {
-            return NotFound();
-        }
-
-        ViewData["Postnum"] = post.Number;
-        return await fn(post);
-    }
 
     [HttpGet("{postNum:int}/favorites")]
     public async Task<IActionResult> Details(int postNum) => await WithPost(postNum, async (post) => View(await favoriteService.GetFavorites(FavoriteType.Post, post.ID)));

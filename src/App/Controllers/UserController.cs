@@ -1,17 +1,12 @@
-using System.Security.Claims;
-using System.Threading.Tasks;
-using App.Authorization;
 using App.Models;
 using App.Services;
-using Data.Models;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers;
 
-public class UserController(ISiteService siteService, IAccountService accountService) : ControllerBase(siteService)
+public class UserController(ISiteService siteService, IPostService postService, IAccountService accountService) : ControllerBase(siteService, postService)
 {
 
     [HttpGet("user/{id:int}")]
@@ -29,13 +24,24 @@ public class UserController(ISiteService siteService, IAccountService accountSer
     [HttpGet("activity/{id:int}/posts/{slug?}")]
     public async Task<IActionResult> PostActivity(int id, string? slug = null, [FromQuery] int page = 1)
     {
-        var user = await accountService.BuildPostActivityModel(id, slug, page);
+        var user = await accountService.UserById(id);
         if (user is null)
         {
             return NotFound();
         }
 
-        return View(user);
+        var site = slug == null ? null : _siteService.SiteBySlug(slug);
+        var posts = site is null ? _postService.CrossSitePostList(p => p.PostedByID == id) : _postService.PostList(site, p => p.PostedByID == id);
+
+        var model = new UserActivityPostModel()
+        {
+            Site = site,
+            User = user,
+            Posts = await PaginatedList<PostModel>.CreateAsync(posts, page, PageSize)
+        };
+        
+
+        return View(model);
     }
 
     [HttpGet("login")]

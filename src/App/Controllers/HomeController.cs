@@ -1,32 +1,24 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using App.Models;
-using Data;
-using Microsoft.EntityFrameworkCore;
-using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using App.Authorization;
-using System.Web;
 using App.Services;
-using System.ServiceModel.Syndication;
-using System;
-using System.Xml;
-using System.Text;
 
 namespace App.Controllers;
 
-public class HomeController(ISiteService siteService, IPostService postService, DataContext context, ILogger<HomeController> logger) : ControllerBase(siteService)
+public class HomeController(ISiteService siteService, IPostService postService, ILogger<HomeController> logger) : ControllerBase(siteService, postService)
 {
     public async Task<IActionResult> Index(int pageNumber = 1, CancellationToken ct = default)
     {
         logger.BeginScope(SiteSlug);
         logger.LogDebug("Load Homepage for {SubSite}", SiteSlug);
 
-        var posts = context.Posts.Where(p => p.Site.ID == SubSite.ID);
+        var posts = _postService.PostList(SubSite);
 
-        return View(new HomepageModel()
+        return View(new PostListModel()
         {
-            Posts = await PostModel.BuildPostList(posts, pageNumber)
+            Posts = await PaginatedList<PostModel>.CreateAsync(posts, pageNumber, PageSize)
         });
     }
 
@@ -41,23 +33,9 @@ public class HomeController(ISiteService siteService, IPostService postService, 
     [Authorize(Policy = Policy.MakePost)]
     public async Task<IActionResult> CreatePost(CreatePostModel post)
     {
-
         if (ModelState.IsValid)
         {
-            var tags = string.IsNullOrWhiteSpace(post.TagList) ? [] : await postService.TagsFromString(post.TagList);
-            var dbModel = new Post()
-            {
-                Body = post.Body ?? string.Empty,
-                Title = post.Title ?? string.Empty,
-                MoreInside = post.MoreInside,
-                SiteID = SubSite.ID,
-                PostedByID = User.GetUserId(),
-                PostedOn = DateTime.UtcNow,
-                Tags = [.. tags]
-            };
-
-            context.Posts.Add(dbModel);
-            await context.SaveChangesAsync();
+            await _postService.CreatePost(post, SubSite, User.GetUserId());
             return RedirectToAction(nameof(Index));
         }
 
@@ -65,59 +43,20 @@ public class HomeController(ISiteService siteService, IPostService postService, 
     }
 
     [HttpGet("{postNum:int}")]
-    public async Task<IActionResult> Post(int postNum, [FromQuery] string? commentError = null)
+    public async Task<IActionResult> Post(int postNum, [FromQuery] string? commentError = null) => await WithPost(postNum, (post) =>
     {
-        var post = await postService.PostBySiteAndNumber(SubSite, postNum, true);
-
-        if (post is null)
-        {
-            return NotFound();
-        }
-
-        return View(new PostpageModel() { Post = post, CommentError = commentError });
-    }
+        return Task.FromResult<IActionResult>(View(new PostpageModel() { Post = post, CommentError = commentError }));
+    }, true);
 
     [HttpGet("{postNum:int}/rss")]
     [ResponseCache(Duration = 1200)]
-    public async Task<IActionResult> PostRss(int postNum)
+    public async Task<IActionResult> PostRss(int postNum) => await WithPost(postNum, (post) =>
     {
-        var post = await postService.PostBySiteAndNumber(SubSite, postNum, true);
+        var postUrl = new Uri(Url.Action(nameof(Post), "Home", new { postNum }, HttpContext.Request.Scheme) ?? "");
+        var rss = _postService.CreatePostRSS(post, postUrl);
 
-        if (post is null)
-        {
-            return NotFound();
-        }
-
-
-        var feed = new SyndicationFeed(post.Title, $"Comments on Post {postNum}", new Uri("https://example.com"), "RSSUrl", DateTime.Now);
-
-        var items = new List<SyndicationItem>();
-        foreach (var item in post.Comments)
-        {
-            var postUrl = new Uri($"{Url.Action(nameof(Post), "Home", new { postNum }, HttpContext.Request.Scheme)}#{item.ID}");
-            var title = $"By {item.PostedBy.UserName}";
-            var description = item.Body;
-            items.Add(new SyndicationItem(title, description, postUrl, $"{SubSite.Slug}-comment-{item.ID}", item.PostedOn));
-        }
-        feed.Items = items;
-
-        var settings = new XmlWriterSettings
-        {
-            Encoding = Encoding.UTF8,
-            NewLineHandling = NewLineHandling.Entitize,
-            NewLineOnAttributes = true,
-            Indent = true,
-        };
-        using var stream = new MemoryStream();
-        using var xmlWriter = XmlWriter.Create(stream, settings);
-
-        var rssFormatter = new Rss20FeedFormatter(feed, false);
-        rssFormatter.WriteTo(xmlWriter);
-        xmlWriter.Flush();
-
-        return File(stream.ToArray(), "application/rss+xml; charset=utf-8");
-
-    }
+        return Task.FromResult<IActionResult>(File(rss, "application/rss+xml; charset=utf-8"));
+    });
 
 
     
@@ -131,23 +70,14 @@ public class HomeController(ISiteService siteService, IPostService postService, 
             return RedirectToAction(nameof(Post), new { postNum, commentError = "cannot post an empty comment" });
         }
 
-        var post = await postService.PostBySiteAndNumber(SubSite, postNum);
+        var post = await _postService.PostBySiteAndNumber(SubSite, postNum);
 
         if (post is null)
         {
             return NotFound();
         }
 
-        var comment = new Comment()
-        {
-            Body = HttpUtility.HtmlEncode(form.Body.Trim()),
-            PostedOn = DateTime.UtcNow,
-            PostID = post.ID,
-            PostedByID = User.GetUserId()
-        };
-
-        await context.Comments.AddAsync(comment);
-        await context.SaveChangesAsync();
+        await _postService.AddComment(post, form, User.GetUserId());
 
         return RedirectToAction(nameof(Post), new { postNum });
 
