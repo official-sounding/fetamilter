@@ -6,9 +6,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace App.Controllers;
 
-public abstract class ControllerBase(ISiteService siteService) : Controller
+public abstract class ControllerBase(ISiteService siteService, IPostService postService) : Controller
 {
     protected readonly ISiteService _siteService = siteService;
+    protected readonly IPostService _postService = postService;
     public string SiteSlug => Request.Host.Host.Split('.')[0] ?? "www";
     public SiteViewModel SubSite => _siteService.SiteBySlug(SiteSlug);
     internal int PageSize = 50;
@@ -21,5 +22,18 @@ public abstract class ControllerBase(ISiteService siteService) : Controller
         ViewData["IsLoggedIn"] = User.Identity?.IsAuthenticated ?? false;
         ViewData["Username"] = User.Identity?.Name;
         base.OnActionExecuted(context);
+    }
+
+    public async Task<IActionResult> WithPost(int postNum, Func<Post, Task<IActionResult>> fn, bool withDetails = false)
+    {
+        var post = await _postService.PostBySiteAndNumber(SubSite, postNum, withDetails);
+
+        if (post is null)
+        {
+            return NotFound();
+        }
+
+        ViewData["Postnum"] = post.Number;
+        return await fn(post);
     }
 }

@@ -3,7 +3,6 @@ using Data;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Dapper;
-using System.Net.Mime;
 using System.Security.Claims;
 using App.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,13 +13,13 @@ namespace App.Services;
 public interface IAccountService
 {
     Task<bool> AuthenticateUser(string? username, string? password, bool rememberMe);
+    Task<User?> UserById(int userId);
     Task<UserpageModel?> BuildUserpageModel(int userId);
-    Task<UserActivityPostModel?> BuildPostActivityModel(int userId, string? slug, int page = 1);
     Task<bool> CreateUser(CreateUserModel model);
     Task<bool> IsUsernameAvailable(string username);
 }
 
-public class AccountService(ILogger<AccountService> logger, DataContext context, ISiteService siteService) : IAccountService
+public class AccountService(ILogger<AccountService> logger, DataContext context, IHttpContextAccessor httpContextAccessor) : IAccountService
 {
     public async Task<bool> AuthenticateUser(string? username, string? password, bool rememberMe)
     {
@@ -50,27 +49,7 @@ public class AccountService(ILogger<AccountService> logger, DataContext context,
         return await SignUserInAsync(user, rememberMe);
     }
 
-    public async Task<UserActivityPostModel?> BuildPostActivityModel(int userId, string? slug, int page = 1)
-    {
-        var user = await context.Users.SingleOrDefaultAsync(u => u.ID == userId);
-        var site = slug == null ? null : siteService.SiteBySlug(slug);
-        if (user is null)
-        {
-            return null;
-        }
-
-        var posts = context.Posts
-            .Include(p => p.PostedBy)
-            .Include(p => p.Site)
-            .Where(p => p.PostedByID == userId && (site == null || p.SiteID == site.ID));
-
-        return new UserActivityPostModel()
-        {
-            Site = site,
-            User = user,
-            Posts = await PostModel.BuildPostList(posts, page)
-        };
-    }
+    public async Task<User?> UserById(int userId) => await context.Users.SingleOrDefaultAsync(u => u.ID == userId);
 
     public async Task<UserpageModel?> BuildUserpageModel(int userId)
     {
