@@ -14,7 +14,6 @@ public class SiteViewModel
 
     public static SiteViewModel BuildViewModel(Site dbModel, SiteConfig config)
     {
-        var scheme = config.UseHttps ? "https" : "http";
         return new SiteViewModel()
         {
             ID = dbModel.ID,
