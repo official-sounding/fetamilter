@@ -16,17 +16,26 @@ article .logline {
     font-size: 0.8rem;
 }
 
-#comments .logline {
-    background-color: #e0e0e0;
+.comment + .comment {
+    margin-top: 2em;
+}
+
+.comment .logline {
+    background-color: var(--accent-bg, #e0e0e0);
     padding: 0.2rem 0.1rem;
     font-size: 0.8rem;
+}
+
+.comment .removed-tombstone {
+    border: 1px solid;
+    background-color: var(--accent-bg, #e0e0e0);
+    padding: 1rem;
 }
 
 #tags {
     float: right;
     clear: both;
-    /* margin-top: 24px; */
-    background-color: #e0e0e0;
+    background-color: var(--accent-bg, #e0e0e0);
     padding: 1rem;
     width: 20ch;
 }
