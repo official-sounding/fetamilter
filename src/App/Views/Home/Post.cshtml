@@ -3,6 +3,7 @@
 @using Westwind.AspNetCore.Markdown
 @{
     ViewData["Title"] = Model.Post.Title;
+    bool userCanComment = (await AuthorizationService.AuthorizeAsync(User, Policy.MakeComment)).Succeeded;
 }
 
 <div class="content">
@@ -45,23 +46,29 @@
 
 
     <div id="comments">
-        @foreach (var comment in Model.Post.Comments)
+        @foreach (Data.Models.Comment comment in Model.Post.Comments)
         {
             <div class="comment" id="@comment.ID">
+            @if(comment.Removed) {
+                <div class="removed-tombstone">
+                    Comment Removed
+                </div>
+            } else {
                 @Html.Raw(Markdown.Parse(comment.Body))
                 <div class="logline">
                     Posted by <a href="/user/@comment.PostedByID">@Html.DisplayFor(_ => comment.PostedBy.UserName)</a>
                     on @Html.DisplayFor(_ => comment.PostedOn)
-                    @if ((await AuthorizationService.AuthorizeAsync(User, Policy.MakeComment)).Succeeded) {
+                    @if (userCanComment) {
                         <comment-favorite-button post="@Model.Post.Number" comment="@comment.ID" initial="@comment.Favorites.Count" />
                     } else if(@comment.Favorites.Count > 0) {
                         <a href="/@Model.Post.Number/@comment.ID/favorites">@comment.Favorites.Count Favorites</a>
                     }
                 </div>
+            }
             </div>
         }
 
-        @if ((await AuthorizationService.AuthorizeAsync(User, Policy.MakeComment)).Succeeded)
+        @if (userCanComment)
         {
             <hr>
             <form method="post" action="@Model.Post.Number/comment">
