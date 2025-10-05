@@ -20,4 +20,42 @@ public class Post
 
     public string PostedByUsername => PostedBy?.UserName ?? string.Empty;
 
+    public PostState State { get; set; } = PostState.Active;
+    public DateTime? StateUpdatedOn { get; set; }
+
+    public bool PostIsExpired(TimeProvider timeProvider, int siteOpenDays)
+    {
+        if (siteOpenDays < 0)
+        {
+            return false;
+        }
+
+        if ((timeProvider.GetUtcNow() - PostedOn).Days > siteOpenDays)
+        {
+            return true;
+        }
+
+        return false;
+    }
+    public bool PostIsOpen(TimeProvider timeProvider, int siteOpenLength)
+    {
+        if (State == PostState.Closed || State == PostState.Deleted)
+        {
+            return false;
+        }
+
+        if (PostIsExpired(timeProvider, siteOpenLength))
+        {
+            return false;
+        }
+
+        return true;
+    }
+}
+
+public enum PostState
+{
+    Active = 0,
+    Closed = 1,
+    Deleted = 2,
 }
