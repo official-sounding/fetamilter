@@ -7,4 +7,5 @@ public class Site
     public required string Title { get; set; }
     public int Order { get; set; }
     public string? Tagline { get; set; }
+    public int? AutoCloseDays { get; set; }
 }
