@@ -34,6 +34,8 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         .ToTable("Post")
         .HasIndex("SiteID", nameof(Post.Number));
 
+        modelBuilder.Entity<Post>().HasOne(p => p.StateUpdatedBy).WithMany();
+
         modelBuilder.Entity<PostFavorite>()
         .ToTable("PostFavorite");
 

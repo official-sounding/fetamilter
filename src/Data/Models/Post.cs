@@ -19,9 +19,12 @@ public class Post
     public ICollection<Tag> Tags { get; set; } = [];
 
     public string PostedByUsername => PostedBy?.UserName ?? string.Empty;
+    public string StateUpdatedByUsername => StateUpdatedBy?.UserName ?? string.Empty;
 
     public PostState State { get; set; } = PostState.Active;
     public DateTime? StateUpdatedOn { get; set; }
+    public User? StateUpdatedBy { get; set; }
+    public string? StateMessage { get; set; }
 
     public bool PostIsExpired(TimeProvider timeProvider, int siteOpenDays)
     {
@@ -37,14 +40,14 @@ public class Post
 
         return false;
     }
-    public bool PostIsOpen(TimeProvider timeProvider, int siteOpenLength)
+    public bool PostIsOpen(TimeProvider timeProvider)
     {
         if (State == PostState.Closed || State == PostState.Deleted)
         {
             return false;
         }
 
-        if (PostIsExpired(timeProvider, siteOpenLength))
+        if (Site?.AutoCloseDays is not null && PostIsExpired(timeProvider, Site.AutoCloseDays.Value))
         {
             return false;
         }
