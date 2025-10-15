@@ -13,6 +13,7 @@ public class Post
     public int SiteID { get; set; }
     public int PostedByID { get; set; }
     public DateTimeOffset PostedOn { get; set; }
+    public int? StateUpdatedByID { get; set; }
 
     public ICollection<Comment> Comments { get; set; } = [];
     public ICollection<PostFavorite> Favorites { get; set; } = [];
