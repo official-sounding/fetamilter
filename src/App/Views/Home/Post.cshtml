@@ -3,9 +3,10 @@
 @using Westwind.AspNetCore.Markdown
 @{
     ViewData["Title"] = Model.Post.Title;
-    bool userCanComment = (await AuthorizationService.AuthorizeAsync(User, Policy.MakeComment)).Succeeded;
-}
+    bool isOpen = Model.Post.PostIsOpen(TimeProvider);
+    bool userCanComment = isOpen && (await AuthorizationService.AuthorizeAsync(User, Policy.MakeComment)).Succeeded;
 
+}
 <div class="content">
         @if(Model.Post.Tags?.Count > 0) {
     <aside id="tags">
@@ -42,6 +43,17 @@
                 <a href="/@Model.Post.Number/favorites">@Model.Post.Favorites.Count users marked this as a favorite</a>
             } 
         </div>
+        @if (!isOpen) {
+            @if(!string.IsNullOrEmpty(Model.Post.StateMessage)) {
+                <div class="status">
+                Post @Html.DisplayFor(m => m.Post.State) by 
+                <a href="/user/@Model.Post.StateUpdatedByID">
+                  @Html.DisplayFor(m => m.Post.StateUpdatedByUsername)
+                </a>: @Html.DisplayFor(m => m.Post.StateMessage)</div>
+            } else {
+                <div class="status">Post closed automatically after @Html.DisplayFor(m => m.Post.Site.AutoCloseDays) days</div>
+            }
+        }
     </article>
 
 
@@ -67,7 +79,7 @@
             }
             </div>
         }
-
+        <hr />
         @if (userCanComment)
         {
             <hr>
@@ -78,6 +90,10 @@
                 </div>
                 <button type="submit">Post Comment</button>
             </form> 
+        } else if(!isOpen) {
+            <div class="no-comments">
+                <p>Post is closed to new comments</p>
+            </div>
         } else {
             <p>Please <a href="/login?returnUrl=/@Model.Post.Number">Log In</a> to make a comment</p>
         }

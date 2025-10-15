@@ -12,6 +12,7 @@ public class Post
     public User PostedBy { get; set; } = null!;
     public int SiteID { get; set; }
     public int PostedByID { get; set; }
+    public int? StateUpdatedByID { get; set; }
     public DateTime PostedOn { get; set; }
 
     public ICollection<Comment> Comments { get; set; } = [];

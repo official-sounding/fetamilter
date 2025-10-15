@@ -25,7 +25,7 @@ public class PostService(DataContext context) : IPostService
 {
     public IQueryable<PostModel> PostList(SiteViewModel site, Expression<Func<Post, bool>>? filterExp = null)
     {
-        var posts = context.Posts.Where(p => p.Site.ID == site.ID);
+        var posts = context.Posts.Where(p => p.Site.ID == site.ID && p.State != PostState.Deleted);
 
         if (filterExp is not null)
         {
