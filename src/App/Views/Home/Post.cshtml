@@ -4,7 +4,9 @@
 @{
     ViewData["Title"] = Model.Post.Title;
     bool isOpen = Model.Post.PostIsOpen(TimeProvider);
-    bool userCanComment = isOpen && (await AuthorizationService.AuthorizeAsync(User, Policy.MakeComment)).Succeeded;
+    bool stdCommentPermission = (await AuthorizationService.AuthorizeAsync(User, Policy.MakeComment)).Succeeded;
+    bool adminCommentPermission = (await AuthorizationService.AuthorizeAsync(User, Policy.PostOfficially)).Succeeded;
+    bool userCanComment = adminCommentPermission || (isOpen && stdCommentPermission);
 
 }
 <div class="content">
