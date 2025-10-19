@@ -17,7 +17,7 @@ public interface IPostService
     Task<Post?> PostBySiteAndNumber(SiteViewModel site, int postNum, bool includeDetails = false);
     Task<IEnumerable<Tag>> TagsFromString(string tagStr);
     Task<Post?> CreatePost(CreatePostModel post, SiteViewModel subSite, int userId);
-    byte[] CreatePostRSS(Post post, Uri postUri);
+    byte[] GeneratePostRSS(Post post, Uri postUri);
     Task AddComment(Post post, CreateCommentModel model, int userId);
 }
 
@@ -115,7 +115,7 @@ public class PostService(DataContext context) : IPostService
         return dbModel;
     }
 
-    public byte[] CreatePostRSS(Post post, Uri postUri)
+    public byte[] GeneratePostRSS(Post post, Uri postUri)
     {
         var feed = new SyndicationFeed(post.Title, $"Comments on Post {post.Number}", postUri, "RSSUrl", DateTime.Now);
 
