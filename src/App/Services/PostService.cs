@@ -66,7 +66,7 @@ public class PostService(DataContext context) : IPostService
 
         if (includeDetails && post is not null)
         {
-            await context.Comments.Where(c => c.Post.ID == post.ID).Include(c => c.PostedBy).Include(c => c.Favorites).LoadAsync();
+            await context.Comments.Where(c => c.Post.ID == post.ID).Include(c => c.PostedBy).Include(c => c.Favorites).OrderBy(c => c.PostedOn).LoadAsync();
         }
 
         return post;
