@@ -21,7 +21,7 @@ public class PostService(DataContext context, TimeProvider timeProvider) : IPost
 {
     public IQueryable<PostModel> PostList(SiteViewModel site, Expression<Func<Post, bool>>? filterExp = null)
     {
-        var posts = context.Posts.Where(p => p.Site.ID == site.ID && p.State != PostState.Deleted);
+        var posts = context.Posts.Where(p => p.Site.ID == site.ID).Where(Post.AppearsInLists);
 
         if (filterExp is not null)
         {
@@ -33,7 +33,7 @@ public class PostService(DataContext context, TimeProvider timeProvider) : IPost
 
     public IQueryable<PostModel> CrossSitePostList(Expression<Func<Post, bool>>? filterExp = null)
     {
-        IQueryable<Post> posts = context.Posts;
+        IQueryable<Post> posts = context.Posts.Where(Post.AppearsInLists);
 
         if (filterExp is not null)
         {

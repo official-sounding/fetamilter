@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace Data.Models;
 
 public class Post
@@ -43,7 +45,7 @@ public class Post
     }
     public bool PostIsOpen(TimeProvider timeProvider)
     {
-        if (State == PostState.Closed || State == PostState.Deleted)
+        if (State != PostState.Active)
         {
             return false;
         }
@@ -55,6 +57,9 @@ public class Post
 
         return true;
     }
+
+    public static Expression<Func<Post,bool>> AppearsInLists => (p) => p.State == PostState.Active || p.State == PostState.Closed;
+
 }
 
 public enum PostState
@@ -62,4 +67,5 @@ public enum PostState
     Active = 0,
     Closed = 1,
     Deleted = 2,
+    Redacted = 3,
 }
