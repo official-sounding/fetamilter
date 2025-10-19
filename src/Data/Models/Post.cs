@@ -27,6 +27,8 @@ public class Post
     public User? StateUpdatedBy { get; set; }
     public string? StateMessage { get; set; }
 
+    public bool AppearsInLists => State == PostState.Active || State == PostState.Closed;
+
     public bool PostIsExpired(TimeProvider timeProvider, int siteOpenDays)
     {
         if (siteOpenDays < 0)
@@ -43,7 +45,7 @@ public class Post
     }
     public bool PostIsOpen(TimeProvider timeProvider)
     {
-        if (State == PostState.Closed || State == PostState.Deleted)
+        if (State != PostState.Active)
         {
             return false;
         }
@@ -62,4 +64,5 @@ public enum PostState
     Active = 0,
     Closed = 1,
     Deleted = 2,
+    Redacted = 3,
 }
