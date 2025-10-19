@@ -53,13 +53,13 @@ public class HomeController(ISiteService siteService, IPostService postService, 
     public async Task<IActionResult> PostRss(int postNum) => await WithPost(postNum, (post) =>
     {
         var postUrl = new Uri(Url.Action(nameof(Post), "Home", new { postNum }, HttpContext.Request.Scheme) ?? "");
-        var rss = _postService.CreatePostRSS(post, postUrl);
+        var rss = _postService.GeneratePostRSS(post, postUrl);
 
         return Task.FromResult<IActionResult>(File(rss, "application/rss+xml; charset=utf-8"));
     });
 
 
-    
+
 
     [HttpPost("{postNum:int}/comment")]
     [Authorize(Policy = Policy.MakeComment)]
