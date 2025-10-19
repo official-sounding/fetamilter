@@ -40,6 +40,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         .HasIndex(nameof(Post.SiteID), nameof(Post.Number));
 
         modelBuilder.Entity<Post>().HasOne(p => p.StateUpdatedBy).WithMany();
+        modelBuilder.Entity<Comment>().HasOne(p => p.RemovedBy).WithMany();
 
         modelBuilder.Entity<PostFavorite>()
         .ToTable("post_favorite");
