@@ -70,7 +70,9 @@
             <div class="comment" id="@comment.ID">
             @if(comment.Removed) {
                 <div class="removed-tombstone">
-                    Comment Removed
+                    Comment Removed By  <a href="/user/@comment.RemovedByID">
+                  @Html.DisplayFor(_ => comment.RemovedBy == null ? "" : comment.RemovedBy.UserName)
+                </a>: @Html.DisplayFor(_ => comment.RemovedNote)
                 </div>
             } else {
                 @Html.Raw(Markdown.Parse(comment.Body))
