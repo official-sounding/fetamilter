@@ -487,3 +487,6 @@ $RECYCLE.BIN/
 # Sqlite files
 main.db
 main.db*
+
+#efbundle
+efbundle.exe

@@ -5,6 +5,7 @@ using App.Config;
 using App.Services;
 using Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,8 +88,16 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
+        var migrate = app.Configuration.GetValue<bool>("MigrateOnStartup");
+        var testData = app.Configuration.GetValue<bool>("ApplyTestData");
+        Console.WriteLine($"migrate = {migrate}, testData = {testData}");
         var context = services.GetRequiredService<DataContext>();
-        await DbInitializer.Initialize(context, true);
+
+        if (migrate)
+        {
+            await context.Database.MigrateAsync();
+        }
+        await DbInitializer.Initialize(context, testData);
     }
     catch (Exception ex)
     {
