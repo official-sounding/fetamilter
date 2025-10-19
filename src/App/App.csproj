@@ -16,6 +16,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.5" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="9.0.6" />
     <PackageReference Include="westwind.aspnetcore.markdown" Version="3.23.0" />
   </ItemGroup>
@@ -23,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\Migrations\Migrations.csproj" />
+    <ProjectReference Include="..\PgsqlMigrations\PgsqlMigrations.csproj" />
   </ItemGroup>
 
 </Project>

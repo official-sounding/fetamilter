@@ -53,6 +53,11 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
             modelBuilder.Entity<User>().Property((u) => u.UserName).UseCollation("NOCASE");
             modelBuilder.Entity<Tag>().Property(t => t.Name).UseCollation("NOCASE");
         }
+        else if (Database.IsNpgsql())
+        {
+            modelBuilder.Entity<User>().Property((u) => u.UserName).HasColumnType("citext");
+            modelBuilder.Entity<Tag>().Property(t => t.Name).HasColumnType("citext");
+        }
     }
 
 }

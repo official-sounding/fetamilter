@@ -1,14 +1,16 @@
 using System.Security.Claims;
+using App;
 using App.Authorization;
 using App.Config;
 using App.Services;
 using Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
 builder.Services.Configure<SiteConfig>(builder.Configuration.GetSection(SiteConfig.SECTION));
+
 
 var siteConfig = builder.Configuration.GetSection(SiteConfig.SECTION).Get<SiteConfig>();
 
@@ -47,8 +49,7 @@ builder.Services.AddAuthorization(o =>
     }
 });
 
-builder.Services.AddDbContext<DataContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("main"), x => x.MigrationsAssembly("Migrations")));
+builder.Services.AddDatabase(builder.Configuration);
 
 if (builder.Environment.IsDevelopment())
 {
