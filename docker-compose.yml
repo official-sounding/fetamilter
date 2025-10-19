@@ -1,0 +1,22 @@
+volumes:
+  fetamilter-pg-v18:
+
+services:
+  fetamilter-db:
+    container_name: fetamilter-db
+    image: postgres:18.0
+    environment:
+      - POSTGRES_USER=fetamilter
+      - POSTGRES_PASSWORD=secret_crouton
+      - POSTGRES_DB=fetamilter
+      - PGDATA=/data/postgres
+    volumes:
+      - fetamilter-pg-v18:/data/postgres
+    ports:
+      - "5332:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
