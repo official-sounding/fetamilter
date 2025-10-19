@@ -59,6 +59,7 @@ public class PostService(DataContext context) : IPostService
             .Include(p => p.Site)
             .Include(p => p.Favorites)
             .Include(p => p.PostedBy)
+            .Include(p => p.StateUpdatedBy)
             .Include(p => p.Tags);
         }
 
@@ -66,7 +67,13 @@ public class PostService(DataContext context) : IPostService
 
         if (includeDetails && post is not null)
         {
-            await context.Comments.Where(c => c.Post.ID == post.ID).Include(c => c.PostedBy).Include(c => c.Favorites).OrderBy(c => c.PostedOn).LoadAsync();
+            await context.Comments
+                .Where(c => c.Post.ID == post.ID)
+                .Include(c => c.PostedBy)
+                .Include(c => c.Favorites)
+                .Include(c => c.RemovedBy)
+                .OrderBy(c => c.PostedOn)
+                .LoadAsync();
         }
 
         return post;
@@ -162,4 +169,12 @@ public class PostService(DataContext context) : IPostService
         await context.Comments.AddAsync(comment);
         await context.SaveChangesAsync();
     }
+}
+
+[Flags]
+public enum PostOptions
+{
+    Basic = 0,
+    IncludeDetails = 1,
+    IncludeComments = 2,
 }
