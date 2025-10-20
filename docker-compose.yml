@@ -1,0 +1,59 @@
+volumes:
+  fetamilter-pg-v18:
+  fetamilter-caddy-data:
+  fetamilter-caddy-config:
+
+networks:
+  fetamilter:
+
+services:
+  fetamilter-db:
+    container_name: fetamilter-db
+    image: postgres:18.0
+    networks:
+      - fetamilter
+    environment:
+      - POSTGRES_USER=fetamilter
+      - POSTGRES_PASSWORD=secret_crouton
+      - POSTGRES_DB=fetamilter
+      - PGDATA=/data/postgres
+    volumes:
+      - fetamilter-pg-v18:/data/postgres
+    ports:
+      - "5332:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  fetamilter-proxy:
+    container_name: fetamilter-proxy
+    image: caddy:2.10-alpine
+    ports:
+      - 80:80
+      - 443:443
+    env_file:
+      - .env
+    networks:
+      - fetamilter
+    volumes:
+      - fetamilter-caddy-data:/data
+      - fetamilter-caddy-config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  fetamilter-app:
+    container_name: fetamilter-app
+    build:
+      context: ./src
+      dockerfile: ./App/Dockerfile
+    ports:
+      - 5108:5108
+    networks:
+      - fetamilter
+    env_file:
+      - .env
+    depends_on:
+      fetamilter-db:
+        condition: service_healthy

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using App;
 using App.Authorization;
 using App.Config;
 using App.Services;
@@ -8,7 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
 builder.Services.Configure<SiteConfig>(builder.Configuration.GetSection(SiteConfig.SECTION));
+
 
 var siteConfig = builder.Configuration.GetSection(SiteConfig.SECTION).Get<SiteConfig>();
 
@@ -47,8 +50,7 @@ builder.Services.AddAuthorization(o =>
     }
 });
 
-builder.Services.AddDbContext<DataContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("main"), x => x.MigrationsAssembly("Migrations")));
+builder.Services.AddDatabase(builder.Configuration);
 
 if (builder.Environment.IsDevelopment())
 {
@@ -86,8 +88,16 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
+        var migrate = app.Configuration.GetValue<bool>("MigrateOnStartup");
+        var testData = app.Configuration.GetValue<bool>("ApplyTestData");
+        Console.WriteLine($"migrate = {migrate}, testData = {testData}");
         var context = services.GetRequiredService<DataContext>();
-        await DbInitializer.Initialize(context, true);
+
+        if (migrate)
+        {
+            await context.Database.MigrateAsync();
+        }
+        await DbInitializer.Initialize(context, testData);
     }
     catch (Exception ex)
     {
