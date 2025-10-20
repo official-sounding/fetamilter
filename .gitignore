@@ -490,3 +490,5 @@ main.db*
 
 #efbundle
 efbundle.exe
+
+.env
