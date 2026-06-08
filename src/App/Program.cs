@@ -21,7 +21,7 @@ ArgumentNullException.ThrowIfNull(siteConfig);
 var mvcbuilder = builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services.AddSingleton<ISiteService, SiteService>();
+builder.Services.AddSingleton<ISiteService, SiteService>(SiteService.Initialize);
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddTransient<IAccountService, AccountService>();
 builder.Services.AddTransient<IPostService, PostService>();
