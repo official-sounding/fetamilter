@@ -1,12 +1,12 @@
-using App.Models;
-using Data;
-using Data.Models;
-using Microsoft.EntityFrameworkCore;
-using Dapper;
 using System.Security.Claims;
 using App.Authorization;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using App.Models;
+using Dapper;
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.Services;
 
@@ -124,7 +124,7 @@ order by s.ID", new { userId })).ToList();
 
     private async Task<bool> SignUserInAsync(User user, bool rememberMe)
     {
-        
+
         var claims = new List<Claim>
                 {
                     new(ClaimTypes.Sid, $"{user.ID}"),

@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
-using Data.Models;
-using Microsoft.AspNetCore.Authorization;
 using App.Authorization;
 using App.Services;
+using Data.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers;
 

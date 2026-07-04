@@ -39,7 +39,7 @@ public class UserController(ISiteService siteService, IPostService postService, 
             User = user,
             Posts = await PaginatedList<PostModel>.CreateAsync(posts, page, PageSize)
         };
-        
+
 
         return View(model);
     }
@@ -64,7 +64,7 @@ public class UserController(ISiteService siteService, IPostService postService, 
         {
             return LocalRedirect(model.ReturnUrl ?? "/");
         }
-        
+
 
         // Something failed. Redisplay the form.
         ModelState.AddModelError(nameof(LoginModel.Username), "Invalid login attempt.");

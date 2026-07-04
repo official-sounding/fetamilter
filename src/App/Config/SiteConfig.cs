@@ -7,14 +7,15 @@ public class SiteConfig
     public int? Port { get; set; }
     public bool UseHttps { get; set; }
 
-    public Uri BuildUri(string subDomain) {
+    public Uri BuildUri(string subDomain)
+    {
 
-            var builder = new UriBuilder() { Scheme = UseHttps ? "https" : "http", Host = $"{subDomain}.{RootDomain}" };
-            if (Port.HasValue)
-            {
-                builder.Port = Port.Value;
-            }
+        var builder = new UriBuilder() { Scheme = UseHttps ? "https" : "http", Host = $"{subDomain}.{RootDomain}" };
+        if (Port.HasValue)
+        {
+            builder.Port = Port.Value;
+        }
 
-            return builder.Uri;
+        return builder.Uri;
     }
 }
