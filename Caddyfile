@@ -1,5 +1,4 @@
-*.metafilter.test {
+http://*.metafilter.test {
     encode gzip
     reverse_proxy host.docker.internal:5108
-    tls internal
 }

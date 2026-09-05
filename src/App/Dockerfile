@@ -6,7 +6,7 @@ COPY . ./
 # Restore as distinct layers
 RUN dotnet restore ./App/App.csproj
 # Build and publish a release
-RUN dotnet publish -o out ./App/App.csproj
+RUN dotnet publish --no-restore -o out ./App/App.csproj
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
