@@ -21,7 +21,7 @@ public class SiteServiceTests
             new Site() { ID = 2, Slug = "ask", Title = "Ask", Order = 2}
         }.ToImmutableDictionary(s => s.Slug);
 
-        var svc = new SiteService(dict, someOptions);
+        var svc = new SiteService(dict, someOptions, 0);
 
         var site = svc.SiteBySlug(input);
 
@@ -33,7 +33,7 @@ public class SiteServiceTests
     {
         var someOptions = Options.Create(new SiteConfig() { RootDomain = "example.com" });
 
-        var svc = new SiteService([], someOptions);
+        var svc = new SiteService([], someOptions, 0);
         Assert.Throws<InvalidProgramException>(() => svc.SiteBySlug("any"));
     }
 
@@ -45,7 +45,7 @@ public class SiteServiceTests
             new Site() { ID = 2, Slug = "ask", Title = "Ask", Order = 2}
         }.ToImmutableDictionary(s => s.Slug);
 
-        var svc = new SiteService(dict, someOptions);
+        var svc = new SiteService(dict, someOptions, 0);
 
         var sites = svc.AllSites().ToList();
 

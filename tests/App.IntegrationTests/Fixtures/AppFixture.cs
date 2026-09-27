@@ -1,3 +1,4 @@
+using App.Config;
 using Data;
 using Data.Models;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -29,6 +30,7 @@ public class AppFixture() : WebApplicationFactory<Program>, IAsyncLifetime
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseSetting("ApplyTestData", "false");
+        builder.UseSetting($"Site:{nameof(SiteConfig.IncludePort)}", "true");
         builder.UseSetting("ConnectionStrings:pgsql", _dbContainer.GetConnectionString());
         builder.UseEnvironment("Testing");
 
@@ -70,8 +72,11 @@ public class AppFixture() : WebApplicationFactory<Program>, IAsyncLifetime
         await ctx.SaveChangesAsync();
 
         List<Post> posts = [
-            new Post() { Body = "This is a post for testing", Title = "Test Post", PostedBy = users[0], Site = sites[0] }
+            new Post() { Body = "This is a post for testing", Title = "Test Post", PostedBy = users[0], Site = sites[0], PostedOn = new(2026, 07, 02, 12, 00, 00, DateTimeKind.Utc) },
+            new Post() { Body = "This is a post for testing with a diff body", Title = "Test Post 2", PostedBy = users[1], Site = sites[0], PostedOn = new(2026, 07, 02, 11, 00, 00, DateTimeKind.Utc) },
+            new Post() { Body = "This is a post for testing on another site", Title = "Test Post", PostedBy = users[0], Site = sites[1], PostedOn = new(2026, 07, 02, 12, 00, 00, DateTimeKind.Utc) },
         ];
+
 
         await ctx.Posts.AddRangeAsync(posts);
         await ctx.SaveChangesAsync();
