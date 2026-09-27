@@ -61,9 +61,9 @@ public class AppFixture() : WebApplicationFactory<Program>, IAsyncLifetime
         }
 
         List<User> users = [
-            new() { EmailAddress = "user1@example.com", UserName = "user1", PasswordHash = "", Role = roles[0] },
-            new() { EmailAddress = "user2@example.com", UserName = "user2", PasswordHash = "", Role = roles[0] },
-            new() { EmailAddress = "mod1@example.com", UserName = "mod1", PasswordHash = "", Role = roles[1] }
+            new() { EmailAddress = "user1@example.com", UserName = "user1", PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"), Role = roles[0] },
+            new() { EmailAddress = "user2@example.com", UserName = "user2", PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"), Role = roles[0] },
+            new() { EmailAddress = "mod1@example.com", UserName = "mod1", PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"), Role = roles[1] }
         ];
 
         await ctx.Users.AddRangeAsync(users);

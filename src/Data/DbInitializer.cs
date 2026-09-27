@@ -95,13 +95,13 @@ public static class DbInitializer
     {
         Site[] sites = [
             new() { Slug = "www", Title = "FetaMilter", Order = 1 },
-                new() { Slug = "ask", Title = "AskFeta", Order = 2 },
-                new() { Slug = "meta", Title = "FetaTalk" , Order = 3}
+            new() { Slug = "ask", Title = "AskFeta", Order = 2 },
+            new() { Slug = "meta", Title = "FetaTalk" , Order = 3}
         ];
 
         Role[] roles = [
             new() { Name = Role.UserRoleName },
-                new() { Name = Role.ModRoleString, NameTag = "Moderator" }
+            new() { Name = Role.ModRoleString, NameTag = "Moderator" }
         ];
 
 
