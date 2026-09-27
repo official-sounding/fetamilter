@@ -24,7 +24,7 @@ public sealed class HttpServerFixture : AppFixture
         get
         {
             StartServer();
-            return ClientOptions.BaseAddress.ToString();
+            return $"http://fetamilter.localhost:{ClientOptions.BaseAddress.Port}";
         }
     }
 }

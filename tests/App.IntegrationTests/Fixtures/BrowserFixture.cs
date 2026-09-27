@@ -100,7 +100,8 @@ public class BrowserFixture(
         {
             IgnoreHTTPSErrors = true, // The test fixture uses a self-signed TLS certificate
             Locale = "en-US",
-            TimezoneId = "America/Chicago"
+            TimezoneId = "America/Chicago",
+            BaseURL = Options.BaseUrl
         };
 
 

@@ -8,6 +8,8 @@ public class BrowserFixtureOptions
 
     public string? BrowserChannel { get; set; }
 
+    public string? BaseUrl { get; set; }
+
     // Only record traces and videos in CI to prevent filling
     // up the local disk with videos from test runs.
 
