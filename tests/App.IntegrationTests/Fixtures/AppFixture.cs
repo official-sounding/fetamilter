@@ -28,7 +28,6 @@ public class AppFixture() : WebApplicationFactory<Program>, IAsyncLifetime
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseSetting("DatabaseType", "pgsql");
         builder.UseSetting("ApplyTestData", "false");
         builder.UseSetting("ConnectionStrings:pgsql", _dbContainer.GetConnectionString());
         builder.UseEnvironment("Testing");

@@ -32,7 +32,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Data\Data.csproj" />
-    <ProjectReference Include="..\Migrations\Migrations.csproj" />
     <ProjectReference Include="..\PgsqlMigrations\PgsqlMigrations.csproj" />
   </ItemGroup>
 
