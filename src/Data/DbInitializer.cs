@@ -14,21 +14,7 @@ public static class DbInitializer
 
         if (!ctx.Sites.Any())
         {
-            sites = [
-                new() { Slug = "www", Title = "FetaMilter", Order = 1 },
-                new() { Slug = "ask", Title = "AskFeta", Order = 2 },
-                new() { Slug = "meta", Title = "FetaTalk" , Order = 3}
-            ];
-
-            roles = [
-                new() { Name = Role.UserRoleName },
-                new() { Name = Role.ModRoleString, NameTag = "Moderator" }
-            ];
-
-
-            await ctx.Sites.AddRangeAsync(sites);
-            await ctx.Roles.AddRangeAsync(roles);
-            await ctx.SaveChangesAsync();
+            (sites, roles) = await CreateRequredData(ctx);
         }
         else
         {
@@ -103,5 +89,26 @@ public static class DbInitializer
 
             await ctx.SaveChangesAsync();
         }
+    }
+
+    public static async Task<(Site[], Role[])> CreateRequredData(DataContext ctx)
+    {
+        Site[] sites = [
+            new() { Slug = "www", Title = "FetaMilter", Order = 1 },
+                new() { Slug = "ask", Title = "AskFeta", Order = 2 },
+                new() { Slug = "meta", Title = "FetaTalk" , Order = 3}
+        ];
+
+        Role[] roles = [
+            new() { Name = Role.UserRoleName },
+                new() { Name = Role.ModRoleString, NameTag = "Moderator" }
+        ];
+
+
+        await ctx.Sites.AddRangeAsync(sites);
+        await ctx.Roles.AddRangeAsync(roles);
+        await ctx.SaveChangesAsync();
+
+        return (sites, roles);
     }
 }

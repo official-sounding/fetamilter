@@ -1,9 +1,9 @@
 using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using App.Models;
-using Microsoft.AspNetCore.Authorization;
 using App.Authorization;
+using App.Models;
 using App.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers;
 
@@ -59,7 +59,7 @@ public class HomeController(ISiteService siteService, IPostService postService, 
     });
 
 
-    
+
 
     [HttpPost("{postNum:int}/comment")]
     [Authorize(Policy = Policy.MakeComment)]
