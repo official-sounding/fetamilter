@@ -77,7 +77,7 @@ public sealed class BrowserStackLocalOptions
             }
 
             arguments.Add("--proxy-host");
-            arguments.Add( options.ProxyHostName);
+            arguments.Add(options.ProxyHostName);
             arguments.Add("--proxy-port");
             arguments.Add(options.ProxyPort.Value.ToString(CultureInfo.InvariantCulture));
 

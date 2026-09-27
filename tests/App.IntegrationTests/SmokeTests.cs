@@ -12,7 +12,7 @@ public class SmokeTests(HttpServerFixture fixture, ITestOutputHelper outputHelpe
     [Fact]
     public async Task GetIndex()
     {
-// Arrange
+        // Arrange
         var browserType = BrowserType.Chromium;
         var browserChannel = "chrome";
 

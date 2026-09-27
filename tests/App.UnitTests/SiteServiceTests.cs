@@ -1,8 +1,8 @@
 ﻿using System.Collections.Immutable;
-using Data.Models;
-using Microsoft.Extensions.Options;
 using App.Config;
 using App.Services;
+using Data.Models;
+using Microsoft.Extensions.Options;
 
 namespace App.UnitTests;
 
@@ -16,8 +16,8 @@ public class SiteServiceTests
     [InlineData("dne", "www")]
     public void SiteBySlug(string input, string expectedSlug)
     {
-        var dict = new [] {
-            new Site() { ID = 1, Slug = "www", Title = "Web", Order = 1}, 
+        var dict = new[] {
+            new Site() { ID = 1, Slug = "www", Title = "Web", Order = 1},
             new Site() { ID = 2, Slug = "ask", Title = "Ask", Order = 2}
         }.ToImmutableDictionary(s => s.Slug);
 
@@ -40,8 +40,8 @@ public class SiteServiceTests
     [Fact]
     public void AllSites()
     {
-        var dict = new [] {
-            new Site() { ID = 1, Slug = "www", Title = "Web", Order = 1}, 
+        var dict = new[] {
+            new Site() { ID = 1, Slug = "www", Title = "Web", Order = 1},
             new Site() { ID = 2, Slug = "ask", Title = "Ask", Order = 2}
         }.ToImmutableDictionary(s => s.Slug);
 
