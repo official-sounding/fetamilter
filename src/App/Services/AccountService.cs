@@ -19,7 +19,7 @@ public interface IAccountService
     Task<bool> IsUsernameAvailable(string username);
 }
 
-public class AccountService(ILogger<AccountService> logger, DataContext context, IHttpContextAccessor httpContextAccessor) : IAccountService
+public class AccountService(ILogger<AccountService> logger, DataContext context, IHttpContextAccessor httpContextAccessor, TimeProvider timeProvider) : IAccountService
 {
     public async Task<bool> AuthenticateUser(string? username, string? password, bool rememberMe)
     {
@@ -99,7 +99,7 @@ order by s.ID", new { userId })).ToList();
                 UserName = model.Username ?? string.Empty,
                 EmailAddress = model.Email ?? string.Empty,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
-                CreatedOn = DateTime.UtcNow,
+                CreatedOn = timeProvider.GetUtcNow().DateTime,
                 RoleID = userRole.Id
             };
 
@@ -151,7 +151,7 @@ order by s.ID", new { userId })).ToList();
         {
             IsPersistent = rememberMe,
             AllowRefresh = true,
-            ExpiresUtc = DateTime.UtcNow.AddDays(365)
+            ExpiresUtc = timeProvider.GetUtcNow().AddDays(365)
         };
 
         if (httpContextAccessor.HttpContext is null)
@@ -165,7 +165,7 @@ order by s.ID", new { userId })).ToList();
                 authProperties);
 
         logger.LogInformation("User {Email} logged in at {Time}.",
-            user.UserName, DateTime.UtcNow);
+            user.UserName, timeProvider.GetUtcNow());
 
         return true;
     }
