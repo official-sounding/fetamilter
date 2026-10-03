@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using App.Authorization;
+using App.Extensions;
 using App.Models;
 using App.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers;
 
-public class HomeController(ISiteService siteService, IPostService postService, ILogger<HomeController> logger) : ControllerBase(siteService, postService)
+public class HomeController(ISiteService siteService, IPostService postService, ILogger<HomeController> logger, TimeProvider timeProvider) : ControllerBase(siteService, postService)
 {
     public async Task<IActionResult> Index(int pageNumber = 1, CancellationToken ct = default)
     {
@@ -53,9 +54,8 @@ public class HomeController(ISiteService siteService, IPostService postService, 
     public async Task<IActionResult> PostRss(int postNum) => await WithPost(postNum, (post) =>
     {
         var postUrl = new Uri(Url.Action(nameof(Post), "Home", new { postNum }, HttpContext.Request.Scheme) ?? "");
-        var rss = _postService.CreatePostRSS(post, postUrl);
-
-        return Task.FromResult<IActionResult>(File(rss, "application/rss+xml; charset=utf-8"));
+        var rss = post.FeedForPost(postUrl, timeProvider);
+        return Task.FromResult<IActionResult>(File(rss.ToBytes(), "application/rss+xml; charset=utf-8"));
     });
 
 
