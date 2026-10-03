@@ -102,7 +102,7 @@ public class PostService(DataContext context, TimeProvider timeProvider) : IPost
             MoreInside = post.MoreInside,
             SiteID = subSite.ID,
             PostedByID = userId,
-            PostedOn = DateTime.UtcNow,
+            PostedOn = timeProvider.GetUtcNow().DateTime,
             Tags = [.. tags]
         };
 
@@ -116,7 +116,7 @@ public class PostService(DataContext context, TimeProvider timeProvider) : IPost
         var comment = new Comment()
         {
             Body = HttpUtility.HtmlEncode(model.Body?.Trim()) ?? string.Empty,
-            PostedOn = DateTime.UtcNow,
+            PostedOn = timeProvider.GetUtcNow().DateTime,
             PostID = post.ID,
             PostedByID = userId
         };
