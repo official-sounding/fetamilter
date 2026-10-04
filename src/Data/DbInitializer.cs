@@ -33,7 +33,7 @@ public static class DbInitializer
                     UserName = Faker.Internet.UserName(),
                     EmailAddress = Faker.Internet.Email(),
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(Faker.Internet.UserName()),
-                    CreatedOn = tp.GetUtcNow().DateTime.AddYears(-5).AddMonths(-1 * Random.Shared.Next(0, 10)).AddHours(Random.Shared.Next(0, 12)),
+                    CreatedOn = tp.GetUtcNow().AddYears(-5).AddMonths(-1 * Random.Shared.Next(0, 10)).AddHours(Random.Shared.Next(0, 12)),
                     Role = roles[0]
                 })
                 .Append(new()
@@ -41,7 +41,7 @@ public static class DbInitializer
                     UserName = "testing-mod",
                     EmailAddress = "testing@example.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"),
-                    CreatedOn = tp.GetUtcNow().DateTime,
+                    CreatedOn = tp.GetUtcNow(),
                     Role = roles[1]
 
                 })
@@ -52,7 +52,7 @@ public static class DbInitializer
             await ctx.SaveChangesAsync();
 
 
-            var date = tp.GetUtcNow().DateTime;
+            var date = tp.GetUtcNow();
             int[] siteCounts = [1, 1, 1];
             for (var j = 0; j < 1000; j++)
             {

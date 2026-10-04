@@ -9,8 +9,7 @@ public static class ServiceCollectionExtensions
     {
         sc.AddDbContext<DataContext>(
             (opts) => opts.UseNpgsql(
-                config.GetConnectionString("pgsql"),
-                x => x.MigrationsAssembly("PgsqlMigrations")
+                config.GetConnectionString("pgsql")
                 )
             );
         return sc;

@@ -9,4 +9,4 @@ public class FavoriteDetailModel
     public int? CommentId { get; set; }
 }
 
-public record FavoriteDetail(int UserID, string Username, DateTime FavoritedOn);
+public record FavoriteDetail(int UserID, string Username, DateTimeOffset FavoritedOn);

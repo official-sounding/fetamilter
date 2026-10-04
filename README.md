@@ -25,3 +25,17 @@ otherwise you can check out the [Caddy Docs](https://caddyserver.com/docs/runnin
 ```
 docker compose cp fetamilter-proxy:/data/caddy/pki/authorities/local/root.crt  $env:TEMP/root.crt && certutil -addstore -f "ROOT" $env:TEMP/root.crt
 ```
+
+## Generating Database Migrations
+
+install the dotnet ef tools
+
+```
+dotnet tool install --global dotnet-ef
+```
+
+navigate the console to the App project, then run
+
+```
+dotnet ef migrations add <migration_name> --project ..\PgsqlMigrations\
+```

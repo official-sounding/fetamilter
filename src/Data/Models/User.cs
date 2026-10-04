@@ -9,7 +9,7 @@ public class User
     public required string PasswordHash { get; set; }
     public bool Disabled { get; set; }
     public string? Bio { get; set; }
-    public DateTime CreatedOn { get; set; }
+    public DateTimeOffset CreatedOn { get; set; }
 
     public Role Role { get; set; } = null!;
     public int RoleID { get; set; }

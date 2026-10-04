@@ -12,7 +12,7 @@ public class Post
     public User PostedBy { get; set; } = null!;
     public int SiteID { get; set; }
     public int PostedByID { get; set; }
-    public DateTime PostedOn { get; set; }
+    public DateTimeOffset PostedOn { get; set; }
 
     public ICollection<Comment> Comments { get; set; } = [];
     public ICollection<PostFavorite> Favorites { get; set; } = [];

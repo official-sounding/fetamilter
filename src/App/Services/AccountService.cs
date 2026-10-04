@@ -64,27 +64,27 @@ public class AccountService(ILogger<AccountService> logger, DataContext context,
         await conn.OpenAsync();
 
         var counts = (await conn.QueryAsync<UserSiteCount>(@"
-        with posts as (
-	select p.SiteID as site, COUNT(*) as posts
-	from post p
-	where p.PostedByID = @userId
-	group by p.SiteID
+with user_post as (
+	select p.site_id as site, COUNT(*) as posts
+	from Post p
+	where p.posted_by_id  = @userId
+	group by p.site_id
 ),
- comments as (
-	select p.SiteID as site, COUNT(*) as comments
-	from comment c
-	join post p on c.PostID = p.ID
-	where c.PostedByID = @userId
-	group by p.SiteID
+ user_comment as (
+	select p.site_id as site, COUNT(*) as comments
+	from Comment c
+	join Post p on c.post_id = p.ID
+	where c.posted_by_id  = @userId
+	group by p.site_id
 )
-SELECT
-	s.Title as site,
+select
+    s.Title as site,
     s.Slug as slug,
-	ifnull(posts.posts, 0) as posts,
-	ifnull(comments.comments, 0) as comments
+    coalesce(user_post.posts, 0) as posts,
+    coalesce(user_comment.comments, 0) as comments
 from Site s
-left join posts on posts.site = s.ID
-left join comments on comments.site = s.ID
+left join user_post on user_post.site = s.ID
+left join user_comment on user_comment.site = s.ID
 order by s.ID", new { userId })).ToList();
         return new() { User = user, Counts = counts };
     }
@@ -99,7 +99,7 @@ order by s.ID", new { userId })).ToList();
                 UserName = model.Username ?? string.Empty,
                 EmailAddress = model.Email ?? string.Empty,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
-                CreatedOn = timeProvider.GetUtcNow().DateTime,
+                CreatedOn = timeProvider.GetUtcNow(),
                 RoleID = userRole.Id
             };
 
