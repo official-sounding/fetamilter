@@ -6,7 +6,7 @@ public class Comment
     public int PostedByID { get; set; }
 
     public User PostedBy { get; set; } = null!;
-    public DateTime PostedOn { get; set; }
+    public DateTimeOffset PostedOn { get; set; }
 
     public int PostID { get; set; }
     public Post Post { get; set; } = null!;

@@ -1,8 +1,5 @@
 using System.Linq.Expressions;
-using System.ServiceModel.Syndication;
-using System.Text;
 using System.Web;
-using System.Xml;
 using App.Models;
 using Data;
 using Data.Models;
@@ -17,11 +14,10 @@ public interface IPostService
     Task<Post?> PostBySiteAndNumber(SiteViewModel site, int postNum, bool includeDetails = false);
     Task<IEnumerable<Tag>> TagsFromString(string tagStr);
     Task<Post?> CreatePost(CreatePostModel post, SiteViewModel subSite, int userId);
-    byte[] CreatePostRSS(Post post, Uri postUri);
     Task AddComment(Post post, CreateCommentModel model, int userId);
 }
 
-public class PostService(DataContext context) : IPostService
+public class PostService(DataContext context, TimeProvider timeProvider) : IPostService
 {
     public IQueryable<PostModel> PostList(SiteViewModel site, Expression<Func<Post, bool>>? filterExp = null)
     {
@@ -106,7 +102,7 @@ public class PostService(DataContext context) : IPostService
             MoreInside = post.MoreInside,
             SiteID = subSite.ID,
             PostedByID = userId,
-            PostedOn = DateTime.UtcNow,
+            PostedOn = timeProvider.GetUtcNow(),
             Tags = [.. tags]
         };
 
@@ -115,46 +111,12 @@ public class PostService(DataContext context) : IPostService
         return dbModel;
     }
 
-    public byte[] CreatePostRSS(Post post, Uri postUri)
-    {
-        var feed = new SyndicationFeed(post.Title, $"Comments on Post {post.Number}", postUri, "RSSUrl", DateTime.Now);
-
-        var items = new List<SyndicationItem>();
-        foreach (var item in post.Comments)
-        {
-            var commentUri = new UriBuilder(postUri)
-            {
-                Fragment = $"{item.ID}"
-            };
-            var title = $"By {item.PostedBy.UserName}";
-            var description = item.Body;
-            items.Add(new SyndicationItem(title, description, commentUri.Uri, $"{post.Site.Slug}-comment-{item.ID}", item.PostedOn));
-        }
-        feed.Items = items;
-
-        var settings = new XmlWriterSettings
-        {
-            Encoding = Encoding.UTF8,
-            NewLineHandling = NewLineHandling.Entitize,
-            NewLineOnAttributes = true,
-            Indent = true,
-        };
-        using var stream = new MemoryStream();
-        using var xmlWriter = XmlWriter.Create(stream, settings);
-
-        var rssFormatter = new Rss20FeedFormatter(feed, false);
-        rssFormatter.WriteTo(xmlWriter);
-        xmlWriter.Flush();
-
-        return stream.ToArray();
-    }
-
     public async Task AddComment(Post post, CreateCommentModel model, int userId)
     {
         var comment = new Comment()
         {
             Body = HttpUtility.HtmlEncode(model.Body?.Trim()) ?? string.Empty,
-            PostedOn = DateTime.UtcNow,
+            PostedOn = timeProvider.GetUtcNow(),
             PostID = post.ID,
             PostedByID = userId
         };

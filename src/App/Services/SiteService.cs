@@ -3,6 +3,8 @@ using App.Config;
 using App.Models;
 using Data;
 using Data.Models;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -14,13 +16,13 @@ public interface ISiteService
     SiteViewModel SiteBySlug(string slug);
 }
 
-public class SiteService(ImmutableDictionary<string, Site> siteBySlug, IOptions<SiteConfig> siteConfig) : ISiteService
+public class SiteService(ImmutableDictionary<string, Site> siteBySlug, IOptions<SiteConfig> siteConfig, int port) : ISiteService
 {
     public SiteViewModel SiteBySlug(string slug)
     {
         if (siteBySlug.TryGetValue(slug, out var site) || siteBySlug.TryGetValue("www", out site))
         {
-            return SiteViewModel.BuildViewModel(site, siteConfig.Value);
+            return SiteViewModel.BuildViewModel(site, siteConfig.Value, port);
         }
 
         throw new InvalidProgramException("Sites Table is not initialized");
@@ -30,7 +32,7 @@ public class SiteService(ImmutableDictionary<string, Site> siteBySlug, IOptions<
     {
         return siteBySlug.Values
             .OrderBy(s => s.Order)
-            .Select(s => SiteViewModel.BuildViewModel(s, siteConfig.Value));
+            .Select(s => SiteViewModel.BuildViewModel(s, siteConfig.Value, port));
     }
 
     public static SiteService Initialize(IServiceProvider svcs)
@@ -39,8 +41,15 @@ public class SiteService(ImmutableDictionary<string, Site> siteBySlug, IOptions<
 
         var config = svcs.GetRequiredService<IOptions<SiteConfig>>();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        var server = svcs.GetRequiredService<IServer>();
+        var addressFeature = server.Features.Get<IServerAddressesFeature>();
+
+        var address = addressFeature?.Addresses.LastOrDefault();
+        var port = address is null ? 0 : new Uri(address).Port;
+
         var sites = context.Sites.AsNoTracking().ToList();
         var siteBySlug = sites.ToImmutableDictionary(s => s.Slug);
-        return new SiteService(siteBySlug, config);
+        return new SiteService(siteBySlug, config, port);
     }
 }

@@ -97,7 +97,7 @@ using (var scope = app.Services.CreateScope())
         {
             await context.Database.MigrateAsync();
         }
-        await DbInitializer.Initialize(context, testData);
+        await DbInitializer.Initialize(context, TimeProvider.System, testData);
     }
     catch (Exception ex)
     {

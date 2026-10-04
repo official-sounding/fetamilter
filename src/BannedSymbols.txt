@@ -59,3 +59,7 @@ M:Microsoft.EntityFrameworkCore.DbContext.FindAsync``1(System.Object[])
 // TODO: figure out how to actually reference a method of a generic class 'cause this shit doesn't work
 M:Microsoft.EntityFrameworkCore.DbSet`1.AddAsync(``0);Use .Add()
 M:Microsoft.EntityFrameworkCore.DbSet`1.AddAsync`1(``0,System.Threading.CancellationToken);Use .Add()
+
+P:System.DateTime.Now;Use TimeProvider.GetUtcNow() instead
+P:System.DateTime.UtcNow;Use TimeProvider.GetUtcNow() instead
+M:System.TimeProvider.GetNow();Use TimeProvider.GetUtcNow() instead

@@ -4,16 +4,16 @@ public class SiteConfig
 {
     public const string SECTION = "Site";
     public string? RootDomain { get; set; }
-    public int? Port { get; set; }
+    public bool IncludePort { get; set; }
     public bool UseHttps { get; set; }
 
-    public Uri BuildUri(string subDomain)
+    public Uri BuildUri(string subDomain, int port)
     {
 
         var builder = new UriBuilder() { Scheme = UseHttps ? "https" : "http", Host = $"{subDomain}.{RootDomain}" };
-        if (Port.HasValue)
+        if (IncludePort)
         {
-            builder.Port = Port.Value;
+            builder.Port = port;
         }
 
         return builder.Uri;

@@ -17,7 +17,7 @@ namespace PgsqlMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.5")
+                .HasAnnotation("ProductVersion", "10.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "citext");
@@ -27,251 +27,315 @@ namespace PgsqlMigrations.Migrations
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
                     b.Property<string>("Body")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("body");
 
                     b.Property<int>("PostID")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("post_id");
 
                     b.Property<int>("PostedByID")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("posted_by_id");
 
-                    b.Property<DateTime>("PostedOn")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTimeOffset>("PostedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("posted_on");
 
                     b.Property<bool>("Removed")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("removed");
 
-                    b.HasKey("ID");
+                    b.HasKey("ID")
+                        .HasName("pk_comment");
 
-                    b.HasIndex("PostID");
+                    b.HasIndex("PostID")
+                        .HasDatabaseName("ix_comment_post_id");
 
-                    b.HasIndex("PostedByID");
+                    b.HasIndex("PostedByID")
+                        .HasDatabaseName("ix_comment_posted_by_id");
 
-                    b.ToTable("Comment", (string)null);
+                    b.ToTable("comment", (string)null);
                 });
 
             modelBuilder.Entity("Data.Models.CommentFavorite", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
                     b.Property<int>("CommentID")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("comment_id");
 
-                    b.Property<DateTime>("FavoritedOn")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTimeOffset>("FavoritedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("favorited_on");
 
                     b.Property<int>("UserID")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
-                    b.HasKey("ID");
+                    b.HasKey("ID")
+                        .HasName("pk_comment_favorite");
 
-                    b.HasIndex("CommentID");
+                    b.HasIndex("CommentID")
+                        .HasDatabaseName("ix_comment_favorite_comment_id");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("UserID")
+                        .HasDatabaseName("ix_comment_favorite_user_id");
 
-                    b.ToTable("CommentFavorite", (string)null);
+                    b.ToTable("comment_favorite", (string)null);
                 });
 
             modelBuilder.Entity("Data.Models.Post", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
                     b.Property<string>("Body")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("body");
 
                     b.Property<string>("MoreInside")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("more_inside");
 
                     b.Property<int>("Number")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("number");
 
                     b.Property<int>("PostedByID")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("posted_by_id");
 
-                    b.Property<DateTime>("PostedOn")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTimeOffset>("PostedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("posted_on");
 
                     b.Property<int>("SiteID")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("site_id");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("title");
 
-                    b.HasKey("ID");
+                    b.HasKey("ID")
+                        .HasName("pk_post");
 
-                    b.HasIndex("PostedByID");
+                    b.HasIndex("PostedByID")
+                        .HasDatabaseName("ix_post_posted_by_id");
 
-                    b.HasIndex("SiteID", "Number");
+                    b.HasIndex("SiteID", "Number")
+                        .HasDatabaseName("ix_post_site_id_number");
 
-                    b.ToTable("Post", (string)null);
+                    b.ToTable("post", (string)null);
                 });
 
             modelBuilder.Entity("Data.Models.PostFavorite", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
-                    b.Property<DateTime>("FavoritedOn")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTimeOffset>("FavoritedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("favorited_on");
 
                     b.Property<int>("PostID")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("post_id");
 
                     b.Property<int>("UserID")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
-                    b.HasKey("ID");
+                    b.HasKey("ID")
+                        .HasName("pk_post_favorite");
 
-                    b.HasIndex("PostID");
+                    b.HasIndex("PostID")
+                        .HasDatabaseName("ix_post_favorite_post_id");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("UserID")
+                        .HasDatabaseName("ix_post_favorite_user_id");
 
-                    b.ToTable("PostFavorite", (string)null);
+                    b.ToTable("post_favorite", (string)null);
                 });
 
             modelBuilder.Entity("Data.Models.Role", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.Property<string>("NameTag")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name_tag");
 
-                    b.HasKey("ID");
+                    b.HasKey("ID")
+                        .HasName("pk_role");
 
-                    b.ToTable("Role", (string)null);
+                    b.ToTable("role", (string)null);
                 });
 
             modelBuilder.Entity("Data.Models.Site", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
                     b.Property<int>("Order")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("order");
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("slug");
 
                     b.Property<string>("Tagline")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("tagline");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("title");
 
-                    b.HasKey("ID");
+                    b.HasKey("ID")
+                        .HasName("pk_site");
 
-                    b.HasIndex(new[] { "Slug" }, "idx_site_slug");
+                    b.HasIndex(new[] { "Slug" }, "idx_site_slug")
+                        .HasDatabaseName("ix_site_slug");
 
-                    b.ToTable("Site", (string)null);
+                    b.ToTable("site", (string)null);
                 });
 
             modelBuilder.Entity("Data.Models.Tag", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("citext");
+                        .HasColumnType("citext")
+                        .HasColumnName("name");
 
-                    b.HasKey("ID");
+                    b.HasKey("ID")
+                        .HasName("pk_tag");
 
                     b.HasIndex(new[] { "Name" }, "idx_tag_name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_tag_name");
 
-                    b.ToTable("Tag", (string)null);
+                    b.ToTable("tag", (string)null);
                 });
 
             modelBuilder.Entity("Data.Models.User", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
                     b.Property<string>("Bio")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("bio");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
 
                     b.Property<bool>("Disabled")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("disabled");
 
                     b.Property<string>("EmailAddress")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("email_address");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("password_hash");
 
                     b.Property<int>("RoleID")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("role_id");
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("citext");
+                        .HasColumnType("citext")
+                        .HasColumnName("user_name");
 
-                    b.HasKey("ID");
+                    b.HasKey("ID")
+                        .HasName("pk_user");
 
-                    b.HasIndex("RoleID");
+                    b.HasIndex("RoleID")
+                        .HasDatabaseName("ix_user_role_id");
 
                     b.HasIndex(new[] { "UserName" }, "idx_user_username")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_user_user_name");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("user", (string)null);
                 });
 
             modelBuilder.Entity("PostTag", b =>
                 {
                     b.Property<int>("PostsID")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("posts_id");
 
                     b.Property<int>("TagsID")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("tags_id");
 
-                    b.HasKey("PostsID", "TagsID");
+                    b.HasKey("PostsID", "TagsID")
+                        .HasName("pk_post_tag");
 
-                    b.HasIndex("TagsID");
+                    b.HasIndex("TagsID")
+                        .HasDatabaseName("ix_post_tag_tags_id");
 
-                    b.ToTable("PostTag");
+                    b.ToTable("post_tag", (string)null);
                 });
 
             modelBuilder.Entity("Data.Models.Comment", b =>
@@ -280,13 +344,15 @@ namespace PgsqlMigrations.Migrations
                         .WithMany("Comments")
                         .HasForeignKey("PostID")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_comment_posts_post_id");
 
                     b.HasOne("Data.Models.User", "PostedBy")
                         .WithMany()
                         .HasForeignKey("PostedByID")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_comment_user_posted_by_id");
 
                     b.Navigation("Post");
 
@@ -299,13 +365,15 @@ namespace PgsqlMigrations.Migrations
                         .WithMany("Favorites")
                         .HasForeignKey("CommentID")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_comment_favorite_comment_comment_id");
 
                     b.HasOne("Data.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_comment_favorite_user_user_id");
 
                     b.Navigation("Comment");
 
@@ -318,13 +386,15 @@ namespace PgsqlMigrations.Migrations
                         .WithMany("Posts")
                         .HasForeignKey("PostedByID")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_post_user_posted_by_id");
 
                     b.HasOne("Data.Models.Site", "Site")
                         .WithMany()
                         .HasForeignKey("SiteID")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_post_site_site_id");
 
                     b.Navigation("PostedBy");
 
@@ -337,13 +407,15 @@ namespace PgsqlMigrations.Migrations
                         .WithMany("Favorites")
                         .HasForeignKey("PostID")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_post_favorite_post_post_id");
 
                     b.HasOne("Data.Models.User", "User")
                         .WithMany("PostFavorites")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_post_favorite_user_user_id");
 
                     b.Navigation("Post");
 
@@ -356,7 +428,8 @@ namespace PgsqlMigrations.Migrations
                         .WithMany()
                         .HasForeignKey("RoleID")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_user_roles_role_id");
 
                     b.Navigation("Role");
                 });
@@ -367,13 +440,15 @@ namespace PgsqlMigrations.Migrations
                         .WithMany()
                         .HasForeignKey("PostsID")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_post_tag_posts_posts_id");
 
                     b.HasOne("Data.Models.Tag", null)
                         .WithMany()
                         .HasForeignKey("TagsID")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_post_tag_tags_tags_id");
                 });
 
             modelBuilder.Entity("Data.Models.Comment", b =>

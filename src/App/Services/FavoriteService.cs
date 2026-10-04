@@ -52,7 +52,7 @@ public class PostFavoriteFacade(DataContext context, TimeProvider timeProvider) 
         var successful = false;
         if ((await context.PostFavorites.CountAsync(pf => pf.PostID == entityId && pf.UserID == userId)) == 0)
         {
-            context.PostFavorites.Add(new PostFavorite() { PostID = entityId, UserID = userId, FavoritedOn = timeProvider.GetUtcNow().DateTime });
+            context.PostFavorites.Add(new PostFavorite() { PostID = entityId, UserID = userId, FavoritedOn = timeProvider.GetUtcNow() });
             await context.SaveChangesAsync();
             successful = true;
         }
@@ -97,7 +97,7 @@ public class CommentFavoriteFacade(DataContext context, TimeProvider timeProvide
         var successful = false;
         if ((await context.CommentFavorites.CountAsync(pf => pf.CommentID == entityId && pf.UserID == userId)) == 0)
         {
-            context.CommentFavorites.Add(new CommentFavorite() { CommentID = entityId, UserID = userId, FavoritedOn = timeProvider.GetUtcNow().DateTime });
+            context.CommentFavorites.Add(new CommentFavorite() { CommentID = entityId, UserID = userId, FavoritedOn = timeProvider.GetUtcNow() });
             await context.SaveChangesAsync();
             successful = true;
         }

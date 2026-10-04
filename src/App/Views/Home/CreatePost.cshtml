@@ -5,7 +5,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-input">
                 <label asp-for="Title" class="control-label">Title</label>
-                <input asp-for="Title" class="form-control" 
+                <input asp-for="Title" class="form-control"
                 aria-describedby="title-validation"
                 aria-invalid="@(ViewData.ModelState.GetValidationState("Title") == ModelValidationState.Invalid ? "true" : "false")"
                 />
@@ -16,14 +16,14 @@
                 <textarea asp-for="Body" class="form-control" ></textarea>
                 <span asp-validation-for="Body" class="text-danger"></span>
             </div>
-            <div class="form-input"></div>
+            <div class="form-input">
                 <label asp-for="MoreInside" class="control-label">More Inside</label>
                 <textarea asp-for="MoreInside" class="form-control" ></textarea>
                 <span asp-validation-for="MoreInside" class="text-danger"></span>
             </div>
-            <div class="form-input"></div>
+            <div class="form-input">
                 <label asp-for="TagList" class="control-label">Tags</label>
-                <input asp-for="TagList" class="form-control" 
+                <input asp-for="TagList" class="form-control"
                 aria-describedby="tags-help tags-validation"
                 aria-invalid="@(ViewData.ModelState.GetValidationState("TagList") == ModelValidationState.Invalid ? "true" : "false")"></textarea>
                 <span asp-validation-for="TagList" class="text-danger" id="tags-validation"></span>

@@ -5,7 +5,7 @@ namespace Data;
 
 public static class DbInitializer
 {
-    public static async Task Initialize(DataContext ctx, bool generateTestData)
+    public static async Task Initialize(DataContext ctx, TimeProvider tp, bool generateTestData)
     {
         await ctx.Database.CanConnectAsync();
 
@@ -33,7 +33,7 @@ public static class DbInitializer
                     UserName = Faker.Internet.UserName(),
                     EmailAddress = Faker.Internet.Email(),
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(Faker.Internet.UserName()),
-                    CreatedOn = DateTime.UtcNow.AddYears(-5).AddMonths(-1 * Random.Shared.Next(0, 10)).AddHours(Random.Shared.Next(0, 12)),
+                    CreatedOn = tp.GetUtcNow().AddYears(-5).AddMonths(-1 * Random.Shared.Next(0, 10)).AddHours(Random.Shared.Next(0, 12)),
                     Role = roles[0]
                 })
                 .Append(new()
@@ -41,7 +41,7 @@ public static class DbInitializer
                     UserName = "testing-mod",
                     EmailAddress = "testing@example.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"),
-                    CreatedOn = DateTime.UtcNow,
+                    CreatedOn = tp.GetUtcNow(),
                     Role = roles[1]
 
                 })
@@ -52,7 +52,7 @@ public static class DbInitializer
             await ctx.SaveChangesAsync();
 
 
-            var date = DateTime.UtcNow;
+            var date = tp.GetUtcNow();
             int[] siteCounts = [1, 1, 1];
             for (var j = 0; j < 1000; j++)
             {
@@ -95,13 +95,13 @@ public static class DbInitializer
     {
         Site[] sites = [
             new() { Slug = "www", Title = "FetaMilter", Order = 1 },
-                new() { Slug = "ask", Title = "AskFeta", Order = 2 },
-                new() { Slug = "meta", Title = "FetaTalk" , Order = 3}
+            new() { Slug = "ask", Title = "AskFeta", Order = 2 },
+            new() { Slug = "meta", Title = "FetaTalk" , Order = 3}
         ];
 
         Role[] roles = [
             new() { Name = Role.UserRoleName },
-                new() { Name = Role.ModRoleString, NameTag = "Moderator" }
+            new() { Name = Role.ModRoleString, NameTag = "Moderator" }
         ];
 
 

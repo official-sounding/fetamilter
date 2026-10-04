@@ -12,7 +12,7 @@ public class SiteViewModel
     public required string Url { get; set; }
     public required string ThemeCssPath { get; set; }
 
-    public static SiteViewModel BuildViewModel(Site dbModel, SiteConfig config)
+    public static SiteViewModel BuildViewModel(Site dbModel, SiteConfig config, int port)
     {
         return new SiteViewModel()
         {
@@ -20,7 +20,7 @@ public class SiteViewModel
             Title = dbModel.Title,
             Tagline = dbModel.Tagline,
             Slug = dbModel.Slug,
-            Url = config.BuildUri(dbModel.Slug).ToString(),
+            Url = config.BuildUri(dbModel.Slug, port).ToString(),
             ThemeCssPath = $"/css/themes/{dbModel.Slug}",
         };
     }

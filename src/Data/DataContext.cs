@@ -16,48 +16,46 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<PostFavorite> PostFavorites { get; set; }
     public DbSet<CommentFavorite> CommentFavorites { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    => optionsBuilder
+        .UseNpgsql(x => x.MigrationsAssembly("PgsqlMigrations"))
+        .UseSnakeCaseNamingConvention();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Site>()
-            .ToTable("Site")
+            .ToTable("site")
             .HasIndex((s) => s.Slug, "idx_site_slug");
 
         modelBuilder.Entity<User>()
-            .ToTable("User")
+            .ToTable("user")
             .HasIndex((u) => u.UserName, "idx_user_username").IsUnique();
 
         modelBuilder.Entity<Comment>()
-            .ToTable("Comment");
+            .ToTable("comment");
 
 
         modelBuilder.Entity<Post>()
-        .ToTable("Post")
-        .HasIndex("SiteID", nameof(Post.Number));
+        .ToTable("post")
+        .HasIndex(nameof(Post.SiteID), nameof(Post.Number));
 
         modelBuilder.Entity<PostFavorite>()
-        .ToTable("PostFavorite");
+        .ToTable("post_favorite");
 
         modelBuilder.Entity<CommentFavorite>()
-        .ToTable("CommentFavorite");
+        .ToTable("comment_favorite");
 
         modelBuilder.Entity<Tag>()
-        .ToTable("Tag")
+        .ToTable("tag")
         .HasIndex((t) => t.Name, "idx_tag_name").IsUnique();
 
 
         modelBuilder.Entity<Role>()
-            .ToTable("Role");
+            .ToTable("role");
 
-        if (Database.IsSqlite())
-        {
-            modelBuilder.Entity<User>().Property((u) => u.UserName).UseCollation("NOCASE");
-            modelBuilder.Entity<Tag>().Property(t => t.Name).UseCollation("NOCASE");
-        }
-        else if (Database.IsNpgsql())
-        {
-            modelBuilder.Entity<User>().Property((u) => u.UserName).HasColumnType("citext");
-            modelBuilder.Entity<Tag>().Property(t => t.Name).HasColumnType("citext");
-        }
+
+        modelBuilder.Entity<User>().Property((u) => u.UserName).HasColumnType("citext");
+        modelBuilder.Entity<Tag>().Property(t => t.Name).HasColumnType("citext");
     }
 
 }
