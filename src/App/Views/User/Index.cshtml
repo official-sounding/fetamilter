@@ -3,13 +3,28 @@
     ViewData["Title"] = $"User Details";
 }
 <div class="content">
-    <h1>@(Model.User.UserName)'s Profile</h1>
-    <hr>
-    <div class="counts">
+    <h2>@(Model.User.UserName)'s Profile</h2>
+    <div class="grid-container">
+    <div class="info grid-box">
+        <h3>Info</h3>
         <ul>
-            @foreach (var item in Model.Counts) {
-                <li>@item.site : <a href="/activity/@Model.User.ID/posts/@item.slug">@item.posts</a> posts, @item.comments comments</li>
-            }
+            <li>Name: </li>
+            <li>Email: </li>
+            <li>Joined: <time datetime="@(Model.User.CreatedOn)" type="just-date">@(Model.User.CreatedOn)</time></li>
         </ul>
     </div>
+    <div class="counts grid-box">
+        <h3>Contributions</h3>
+        <ul>
+            @foreach (var item in Model.Counts) {
+                <li><span>@item.site</span>: <a href="/activity/@Model.User.ID/posts/@item.slug">@item.posts</a> posts, <a href="/activity/@Model.User.ID/comments/@item.slug">@item.comments</a> comments</li>
+            }
+        </ul>
+        <p><a href="/activity/@Model.User.ID">View All Activity</a></p>
+    </div>
+    <div class="about grid-box span-all">
+        <h3>About</h3>
+    </div>
+    </div>
+
 </div>

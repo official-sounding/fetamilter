@@ -1,0 +1,19 @@
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+
+.grid-box h3 {
+    font-size: 0.8em;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+}
+
+.span-all {
+    grid-column: 1 / 4;
+}
+
+.content ul {
+    list-style: none;
+    padding-left: 0;
+}
