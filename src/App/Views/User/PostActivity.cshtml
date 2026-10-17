@@ -22,7 +22,7 @@
             </div>
             <div class="logline">
                 Posted to @item.Post.Site.Title by <a href="/user/@item.Post.PostedByID">@Html.DisplayFor(_ => item.Post.PostedByUsername)</a>
-                on @Html.DisplayFor(_ => item.Post.PostedOn)
+                on <time datetime="@item.Post.PostedOn" type="logline">@Html.DisplayFor(_ => item.Post.PostedOn)</time>
 
                 <a href="/@item.Post.Number">
                     @Html.DisplayFor(_ => item.CommentCount)
