@@ -3,22 +3,29 @@
 @using Westwind.AspNetCore.Markdown
 @{
     ViewData["Title"] = Model.Post.Title;
-    bool userCanComment = (await AuthorizationService.AuthorizeAsync(User, Policy.MakeComment)).Succeeded;
-}
+    bool isOpen = Model.Post.PostIsOpen(TimeProvider);
+    bool stdCommentPermission = (await AuthorizationService.AuthorizeAsync(User, Policy.MakeComment)).Succeeded;
+    bool adminCommentPermission = (await AuthorizationService.AuthorizeAsync(User, Policy.PostOfficially)).Succeeded;
+    bool userCanComment = adminCommentPermission || (isOpen && stdCommentPermission);
 
+}
 <div class="content">
-        @if(Model.Post.Tags?.Count > 0) {
-    <aside id="tags">
-        <h3>Tags</h3>
-        <ul>
-            @foreach(var tag in Model.Post.Tags) {
-                <li>@tag.Name</li>
-            }
-        </ul>
-    </aside>
-    
+    @if(Model.Post.Tags?.Count > 0) {
+        <aside id="tags">
+            <h3>Tags</h3>
+            <ul>
+                @foreach(var tag in Model.Post.Tags) {
+                    <li>@tag.Name</li>
+                }
+            </ul>
+        </aside>
     }
     <article>
+        @if(Model.Post.State == Data.Models.PostState.Redacted) {
+             <div class="status">Post has been Redacted by <a href="/user/@Model.Post.StateUpdatedByID">
+                  @Html.DisplayFor(m => m.Post.StateUpdatedByUsername)
+                </a>: @Html.DisplayFor(m => m.Post.StateMessage)</div>
+        } else {
         <h2>@Html.DisplayFor(m => m.Post.Title)</h2>
         <h3>@Html.DisplayFor(m => m.Post.PostedOn)</h3>
         <div class="postBody">
@@ -42,6 +49,18 @@
                 <a href="/@Model.Post.Number/favorites">@Model.Post.Favorites.Count users marked this as a favorite</a>
             } 
         </div>
+        @if (!isOpen) {
+            @if(!string.IsNullOrEmpty(Model.Post.StateMessage)) {
+                <div class="status">
+                Post @Html.DisplayFor(m => m.Post.State) by 
+                <a href="/user/@Model.Post.StateUpdatedByID">
+                  @Html.DisplayFor(m => m.Post.StateUpdatedByUsername)
+                </a>: @Html.DisplayFor(m => m.Post.StateMessage)</div>
+            } else {
+                <div class="status">Post closed automatically after @Html.DisplayFor(m => m.Post.Site.AutoCloseDays) days</div>
+            }
+        }
+        }
     </article>
 
 
@@ -51,7 +70,9 @@
             <div class="comment" id="@comment.ID">
             @if(comment.Removed) {
                 <div class="removed-tombstone">
-                    Comment Removed
+                    Comment Removed By  <a href="/user/@comment.RemovedByID">
+                  @Html.DisplayFor(_ => comment.RemovedBy == null ? "" : comment.RemovedBy.UserName)
+                </a>: @Html.DisplayFor(_ => comment.RemovedNote)
                 </div>
             } else {
                 @Html.Raw(Markdown.Parse(comment.Body))
@@ -67,7 +88,7 @@
             }
             </div>
         }
-
+        <hr />
         @if (userCanComment)
         {
             <hr>
@@ -78,6 +99,10 @@
                 </div>
                 <button type="submit">Post Comment</button>
             </form> 
+        } else if(!isOpen) {
+            <div class="no-comments">
+                <p>Post is closed to new comments</p>
+            </div>
         } else {
             <p>Please <a href="/login?returnUrl=/@Model.Post.Number">Log In</a> to make a comment</p>
         }

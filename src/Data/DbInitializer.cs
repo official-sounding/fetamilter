@@ -94,9 +94,9 @@ public static class DbInitializer
     public static async Task<(Site[], Role[])> CreateRequredData(DataContext ctx)
     {
         Site[] sites = [
-            new() { Slug = "www", Title = "FetaMilter", Order = 1 },
-            new() { Slug = "ask", Title = "AskFeta", Order = 2 },
-            new() { Slug = "meta", Title = "FetaTalk" , Order = 3}
+            new() { Slug = "www", Title = "FetaMilter", Order = 1, AutoCloseDays = 30 },
+            new() { Slug = "ask", Title = "AskFeta", Order = 2, AutoCloseDays = 365 },
+            new() { Slug = "meta", Title = "FetaTalk" , Order = 3, AutoCloseDays = 30 }
         ];
 
         Role[] roles = [

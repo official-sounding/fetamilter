@@ -53,6 +53,18 @@ namespace PgsqlMigrations.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("removed");
 
+                    b.Property<int?>("RemovedByID")
+                        .HasColumnType("integer")
+                        .HasColumnName("removed_by_id");
+
+                    b.Property<string>("RemovedNote")
+                        .HasColumnType("text")
+                        .HasColumnName("removed_note");
+
+                    b.Property<DateTime?>("RemovedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("removed_on");
+
                     b.HasKey("ID")
                         .HasName("pk_comment");
 
@@ -61,6 +73,9 @@ namespace PgsqlMigrations.Migrations
 
                     b.HasIndex("PostedByID")
                         .HasDatabaseName("ix_comment_posted_by_id");
+
+                    b.HasIndex("RemovedByID")
+                        .HasDatabaseName("ix_comment_removed_by_id");
 
                     b.ToTable("comment", (string)null);
                 });
@@ -132,6 +147,22 @@ namespace PgsqlMigrations.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("site_id");
 
+                    b.Property<int>("State")
+                        .HasColumnType("integer")
+                        .HasColumnName("state");
+
+                    b.Property<string>("StateMessage")
+                        .HasColumnType("text")
+                        .HasColumnName("state_message");
+
+                    b.Property<int?>("StateUpdatedByID")
+                        .HasColumnType("integer")
+                        .HasColumnName("state_updated_by_id");
+
+                    b.Property<DateTime?>("StateUpdatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("state_updated_on");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text")
@@ -142,6 +173,9 @@ namespace PgsqlMigrations.Migrations
 
                     b.HasIndex("PostedByID")
                         .HasDatabaseName("ix_post_posted_by_id");
+
+                    b.HasIndex("StateUpdatedByID")
+                        .HasDatabaseName("ix_post_state_updated_by_id");
 
                     b.HasIndex("SiteID", "Number")
                         .HasDatabaseName("ix_post_site_id_number");
@@ -214,6 +248,10 @@ namespace PgsqlMigrations.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+
+                    b.Property<int?>("AutoCloseDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("auto_close_days");
 
                     b.Property<int>("Order")
                         .HasColumnType("integer")
@@ -354,9 +392,16 @@ namespace PgsqlMigrations.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_comment_user_posted_by_id");
 
+                    b.HasOne("Data.Models.User", "RemovedBy")
+                        .WithMany()
+                        .HasForeignKey("RemovedByID")
+                        .HasConstraintName("fk_comment_user_removed_by_id");
+
                     b.Navigation("Post");
 
                     b.Navigation("PostedBy");
+
+                    b.Navigation("RemovedBy");
                 });
 
             modelBuilder.Entity("Data.Models.CommentFavorite", b =>
@@ -396,9 +441,16 @@ namespace PgsqlMigrations.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_post_site_site_id");
 
+                    b.HasOne("Data.Models.User", "StateUpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("StateUpdatedByID")
+                        .HasConstraintName("fk_post_user_state_updated_by_id");
+
                     b.Navigation("PostedBy");
 
                     b.Navigation("Site");
+
+                    b.Navigation("StateUpdatedBy");
                 });
 
             modelBuilder.Entity("Data.Models.PostFavorite", b =>

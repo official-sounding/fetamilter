@@ -21,7 +21,7 @@ public class PostService(DataContext context, TimeProvider timeProvider) : IPost
 {
     public IQueryable<PostModel> PostList(SiteViewModel site, Expression<Func<Post, bool>>? filterExp = null)
     {
-        var posts = context.Posts.Where(p => p.Site.ID == site.ID);
+        var posts = context.Posts.Where(p => p.Site.ID == site.ID).Where(Post.AppearsInLists);
 
         if (filterExp is not null)
         {
@@ -33,7 +33,7 @@ public class PostService(DataContext context, TimeProvider timeProvider) : IPost
 
     public IQueryable<PostModel> CrossSitePostList(Expression<Func<Post, bool>>? filterExp = null)
     {
-        IQueryable<Post> posts = context.Posts;
+        IQueryable<Post> posts = context.Posts.Where(Post.AppearsInLists);
 
         if (filterExp is not null)
         {
@@ -55,6 +55,7 @@ public class PostService(DataContext context, TimeProvider timeProvider) : IPost
             .Include(p => p.Site)
             .Include(p => p.Favorites)
             .Include(p => p.PostedBy)
+            .Include(p => p.StateUpdatedBy)
             .Include(p => p.Tags);
         }
 
@@ -62,7 +63,13 @@ public class PostService(DataContext context, TimeProvider timeProvider) : IPost
 
         if (includeDetails && post is not null)
         {
-            await context.Comments.Where(c => c.Post.ID == post.ID).Include(c => c.PostedBy).Include(c => c.Favorites).LoadAsync();
+            await context.Comments
+                .Where(c => c.Post.ID == post.ID)
+                .Include(c => c.PostedBy)
+                .Include(c => c.Favorites)
+                .Include(c => c.RemovedBy)
+                .OrderBy(c => c.PostedOn)
+                .LoadAsync();
         }
 
         return post;
@@ -124,4 +131,12 @@ public class PostService(DataContext context, TimeProvider timeProvider) : IPost
         await context.Comments.AddAsync(comment);
         await context.SaveChangesAsync();
     }
+}
+
+[Flags]
+public enum PostOptions
+{
+    Basic = 0,
+    IncludeDetails = 1,
+    IncludeComments = 2,
 }
