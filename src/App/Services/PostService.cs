@@ -11,6 +11,8 @@ public interface IPostService
 {
     IQueryable<PostModel> PostList(SiteViewModel site, Expression<Func<Post, bool>>? filterExp = null);
     IQueryable<PostModel> CrossSitePostList(Expression<Func<Post, bool>>? filterExp = null);
+    IQueryable<CommentModel> CommentList(SiteViewModel site, Expression<Func<Comment, bool>>? filterExp = null);
+    IQueryable<CommentModel> CrossSiteCommentList(Expression<Func<Comment, bool>>? filterExp = null);
     Task<Post?> PostBySiteAndNumber(SiteViewModel site, int postNum, bool includeDetails = false);
     Task<IEnumerable<Tag>> TagsFromString(string tagStr);
     Task<Post?> CreatePost(CreatePostModel post, SiteViewModel subSite, int userId);
@@ -41,6 +43,30 @@ public class PostService(DataContext context, TimeProvider timeProvider) : IPost
         }
 
         return posts.Include(p => p.PostedBy).OrderByDescending(p => p.PostedOn).AsNoTracking().Select(p => new PostModel(p, p.Comments.Count(), p.Favorites.Count()));
+    }
+
+        public IQueryable<CommentModel> CommentList(SiteViewModel site, Expression<Func<Comment, bool>>? filterExp = null)
+    {
+        var comments = context.Comments.Where(p => p.Post.SiteID == site.ID).Where((c) => !c.Removed);
+
+        if (filterExp is not null)
+        {
+            comments = comments.Where(filterExp);
+        }
+
+        return comments.Include(p => p.PostedBy).Include(p => p.Post).OrderByDescending(p => p.PostedOn).AsNoTracking().Select(p => new CommentModel(p, p.Favorites.Count()));
+    }
+
+    public IQueryable<CommentModel> CrossSiteCommentList(Expression<Func<Comment, bool>>? filterExp = null)
+    {
+        var comments = context.Comments.Where((c) => !c.Removed);
+
+        if (filterExp is not null)
+        {
+            comments = comments.Where(filterExp);
+        }
+
+        return comments.Include(p => p.PostedBy).Include(p => p.Post).OrderByDescending(p => p.PostedOn).AsNoTracking().Select(p => new CommentModel(p, p.Favorites.Count()));
     }
 
     public async Task<Post?> PostBySiteAndNumber(SiteViewModel site, int postNum, bool includeDetails = false)
