@@ -21,6 +21,7 @@ public class UserController(ISiteService siteService, IPostService postService, 
         return View(user);
     }
 
+    [HttpGet("activity/{id:int}")]
     [HttpGet("activity/{id:int}/posts/{slug?}")]
     public async Task<IActionResult> PostActivity(int id, string? slug = null, [FromQuery] int page = 1)
     {
@@ -38,6 +39,29 @@ public class UserController(ISiteService siteService, IPostService postService, 
             Site = site,
             User = user,
             Posts = await PaginatedList<PostModel>.CreateAsync(posts, page, PageSize)
+        };
+
+
+        return View(model);
+    }
+
+    [HttpGet("activity/{id:int}/comments/{slug?}")]
+    public async Task<IActionResult> CommentActivity(int id, string? slug = null, [FromQuery] int page = 1)
+    {
+        var user = await accountService.UserById(id);
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        var site = slug == null ? null : _siteService.SiteBySlug(slug);
+        var posts = site is null ? _postService.CrossSiteCommentList(p => p.PostedByID == id) : _postService.CommentList(site, p => p.PostedByID == id);
+
+        var model = new UserActivityCommentModel()
+        {
+            Site = site,
+            User = user,
+            Comments = await PaginatedList<CommentModel>.CreateAsync(posts, page, PageSize)
         };
 
 

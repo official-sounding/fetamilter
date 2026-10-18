@@ -1,7 +1,9 @@
 @using App.Authorization
+@using App.Services
 @model App.Models.UserActivityPostModel;
+@inject ISiteService siteService;
 @{
-    ViewData["Title"] = $"User Activity";
+    ViewData["Title"] = $"User Activity - Posts";
 
     var countStart = Model.Posts.HasPreviousPage ? (Model.Posts.PageIndex-1) * Model.Posts.PageSize : 1;
     var countEnd = Model.Posts.HasNextPage ? (Model.Posts.PageIndex-1) * Model.Posts.PageSize : Model.Posts.TotalCount;
@@ -17,14 +19,14 @@
     {
         <article>
             <div class="post">
-                <h2><a href="/@item.Post.Number">@Html.DisplayFor(_ => item.Post.Title)</a></h2>
+                <h2><a href="@siteService.AbsolutePostUri(item.Post)">@Html.DisplayFor(_ => item.Post.Title)</a></h2>
                 <p>@Html.DisplayFor(_ => item.Post.Body)</p>
             </div>
             <div class="logline">
                 Posted to @item.Post.Site.Title by <a href="/user/@item.Post.PostedByID">@Html.DisplayFor(_ => item.Post.PostedByUsername)</a>
                 on <time datetime="@item.Post.PostedOn" type="logline">@Html.DisplayFor(_ => item.Post.PostedOn)</time>
 
-                <a href="/@item.Post.Number">
+                <a href="@siteService.AbsolutePostUri(item.Post)">
                     @Html.DisplayFor(_ => item.CommentCount)
                     @(item.CommentCount == 1 ? "Comment" : "Comments")</a>
                 @if ((await AuthorizationService.AuthorizeAsync(User, Policy.MakePost)).Succeeded) {

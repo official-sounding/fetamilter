@@ -16,12 +16,11 @@ public class SiteServiceTests
     [InlineData("dne", "www")]
     public void SiteBySlug(string input, string expectedSlug)
     {
-        var dict = new[] {
+        var sites = new[] {
             new Site() { ID = 1, Slug = "www", Title = "Web", Order = 1},
             new Site() { ID = 2, Slug = "ask", Title = "Ask", Order = 2}
-        }.ToImmutableDictionary(s => s.Slug);
-
-        var svc = new SiteService(dict, someOptions, 0);
+        };
+        var svc = new SiteService(sites, someOptions, 0);
 
         var site = svc.SiteBySlug(input);
 
@@ -40,12 +39,12 @@ public class SiteServiceTests
     [Fact]
     public void AllSites()
     {
-        var dict = new[] {
+        var allSites = new[] {
             new Site() { ID = 1, Slug = "www", Title = "Web", Order = 1},
             new Site() { ID = 2, Slug = "ask", Title = "Ask", Order = 2}
-        }.ToImmutableDictionary(s => s.Slug);
+        };
 
-        var svc = new SiteService(dict, someOptions, 0);
+        var svc = new SiteService(allSites, someOptions, 0);
 
         var sites = svc.AllSites().ToList();
 
@@ -54,4 +53,23 @@ public class SiteServiceTests
         Assert.Equal("www", sites[0].Slug);
         Assert.Equal("ask", sites[1].Slug);
     }
+
+    [Theory]
+    [InlineData(1, 100, null, "http://www.example.com/100")]
+    [InlineData(2, 200, null, "http://ask.example.com/200")]
+    [InlineData(1, 300, 123, "http://www.example.com/300#123")]
+    public void AbsolutePostUri(int siteId, int postNumber, int? commentId, string expected)
+    {
+        var post = new Post { SiteID = siteId, Number = postNumber, Title = string.Empty, Body = string.Empty };
+        var allSites = new[] {
+            new Site() { ID = 1, Slug = "www", Title = "Web", Order = 1},
+            new Site() { ID = 2, Slug = "ask", Title = "Ask", Order = 2}
+        };
+
+        var svc = new SiteService(allSites, someOptions, 0);
+        var result = svc.AbsolutePostUri(post, commentId);
+
+        Assert.Equal(expected, result);
+    }
+
 }

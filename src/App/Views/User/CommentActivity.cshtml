@@ -1,0 +1,48 @@
+@using App.Authorization
+@using App.Services
+@model App.Models.UserActivityCommentModel;
+@inject ISiteService siteService;
+@{
+    ViewData["Title"] = $"User Activity - Comments";
+
+    var countStart = Model.Comments.HasPreviousPage ? (Model.Comments.PageIndex-1) * Model.Comments.PageSize : 1;
+    var countEnd = Model.Comments.HasNextPage ? (Model.Comments.PageIndex-1) * Model.Comments.PageSize : Model.Comments.TotalCount;
+    var countSite = Model.Site?.Title ?? "All Subsites";
+
+}
+
+<div class="content">
+    <h1>Activity from <a href="/user/@Model.User.ID">@Model.User.UserName</a></h1>
+    <h3>Comments @(countStart) to @(countEnd) of @Model.Comments.TotalCount from @(countSite)</h3>
+    <hr />
+    @foreach (var item in Model.Comments)
+    {
+        <article>
+            <div class="comment">
+                <p>@Html.DisplayFor(_ => item.Comment.Body)</p>
+            </div>
+            <div class="logline">
+                Posted to <a href="@siteService.AbsolutePostUri(item.Comment.Post, item.Comment.ID)">@item.Comment.Post.Title</a>
+                by <a href="/user/@item.Comment.PostedByID">@Html.DisplayFor(_ => item.Comment.PostedBy.UserName)</a>
+                on <time datetime="@item.Comment.PostedOn" type="logline">@Html.DisplayFor(_ => item.Comment.PostedOn)</time>
+
+                @if ((await AuthorizationService.AuthorizeAsync(User, Policy.MakeComment)).Succeeded) {
+                    <Comment-favorite-button Comment="@item.Comment.ID" />
+                }
+            </div>
+        </article>
+        <hr />
+    }
+</div>
+
+<div>
+    @if (Model.Comments.HasPreviousPage)
+    {
+        <a href="#">&lt; Prev Page</a>
+    }
+
+    @if (Model.Comments.HasNextPage)
+    {
+        <a href="#">Next Page &gt;</a>
+    }
+</div>
