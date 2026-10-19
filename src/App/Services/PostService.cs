@@ -30,7 +30,7 @@ public class PostService(DataContext context, TimeProvider timeProvider) : IPost
             posts = posts.Where(filterExp);
         }
 
-        return posts.Include(p => p.PostedBy).OrderByDescending(p => p.PostedOn).AsNoTracking().Select(p => new PostModel(p, p.Comments.Count(), p.Favorites.Count()));
+        return posts.Include(p => p.Site).Include(p => p.PostedBy).OrderByDescending(p => p.PostedOn).AsNoTracking().Select(p => new PostModel(p, p.Comments.Count(), p.Favorites.Count()));
     }
 
     public IQueryable<PostModel> CrossSitePostList(Expression<Func<Post, bool>>? filterExp = null)
@@ -42,7 +42,7 @@ public class PostService(DataContext context, TimeProvider timeProvider) : IPost
             posts = posts.Where(filterExp);
         }
 
-        return posts.Include(p => p.PostedBy).OrderByDescending(p => p.PostedOn).AsNoTracking().Select(p => new PostModel(p, p.Comments.Count(), p.Favorites.Count()));
+        return posts.Include(p => p.Site).Include(p => p.PostedBy).OrderByDescending(p => p.PostedOn).AsNoTracking().Select(p => new PostModel(p, p.Comments.Count(), p.Favorites.Count()));
     }
 
         public IQueryable<CommentModel> CommentList(SiteViewModel site, Expression<Func<Comment, bool>>? filterExp = null)

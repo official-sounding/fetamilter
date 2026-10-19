@@ -12,7 +12,13 @@
 }
 
 <div class="content">
-    <h1>Activity from <a href="/user/@Model.User.ID">@Model.User.UserName</a></h1>
+    <h2>Activity from <a href="/user/@Model.User.ID">@Model.User.UserName</a></h2>
+    <nav>
+        <ul>
+            <li class="active"><a href="/activity/@Model.User.ID/posts/@Model.Site?.Slug">Posts</a></li>
+            <li><a href="/activity/@Model.User.ID/comments/@Model.Site?.Slug">Comments</a></li>
+        </ul>
+    </nav>
     <h3>Posts @(countStart) to @(countEnd) of @Model.Posts.TotalCount from @(countSite)</h3>
     <hr />
     @foreach (var item in Model.Posts)
