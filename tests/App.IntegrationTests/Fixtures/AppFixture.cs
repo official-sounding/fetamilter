@@ -74,11 +74,20 @@ public class AppFixture() : WebApplicationFactory<Program>, IAsyncLifetime
         List<Post> posts = [
             new Post() { Body = "This is a post for testing", Title = "Test Post", PostedBy = users[0], Site = sites[0], PostedOn = new(new(2026, 07, 02, 12, 00, 00, DateTimeKind.Utc)) },
             new Post() { Body = "This is a post for testing with a diff body", Title = "Test Post 2", PostedBy = users[1], Site = sites[0], PostedOn = new(new(2026, 07, 02, 11, 00, 00, DateTimeKind.Utc)) },
-            new Post() { Body = "This is a post for testing on another site", Title = "Test Post", PostedBy = users[0], Site = sites[1], PostedOn = new(new(2026, 07, 02, 12, 00, 00, DateTimeKind.Utc)) },
+            new Post() { Body = "This is a post for testing with a diff body on another site", Title = "Test Post 3", PostedBy = users[1], Site = sites[1], PostedOn = new(new(2026, 07, 02, 11, 00, 00, DateTimeKind.Utc)) },
         ];
 
 
         await ctx.Posts.AddRangeAsync(posts);
+        await ctx.SaveChangesAsync();
+
+        List<Comment> comments = [
+            new Comment() { Body = "This is a comment 1", Post = posts[0], PostedBy = users[1], PostedOn = new(new(2026, 07, 03, 12, 01, 00, DateTimeKind.Utc)) },
+            new Comment() { Body = "This is a comment 2", Post = posts[1], PostedBy = users[1], PostedOn = new(new(2026, 07, 03, 12, 02, 00, DateTimeKind.Utc)) },
+            new Comment() { Body = "This is a comment 3", Post = posts[2], PostedBy = users[1], PostedOn = new(new(2026, 07, 03, 12, 03, 00, DateTimeKind.Utc)) }
+        ];
+
+        await ctx.Comments.AddRangeAsync(comments);
         await ctx.SaveChangesAsync();
     }
 }

@@ -1,7 +1,25 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿document.querySelectorAll('time').forEach($e => {
+  const date = new Date($e.dateTime);
+  const type = $e.getAttribute('type');
 
-// Write your JavaScript code.
+  switch(type) {
+    case 'just-date':
+        $e.innerHTML = date.toLocaleDateString();
+        break;
+    case 'logline':
+        $e.innerHTML = date.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short'});
+        break;
+    case 'post-title':
+        $e.innerHTML = date.toLocaleString(undefined, { dateStyle: 'long', timeStyle: 'short'});
+        break;
+    default:
+        $e.innerHTML = date.toLocaleString();
+  }
+});
+
+
+
+
 class PostFavoriteButton extends HTMLElement {
     static observedAttributes = ["post", "full-text"];
 
@@ -125,7 +143,7 @@ class CommentFavoriteButton extends HTMLElement {
 
         const sheet = new CSSStyleSheet();
         sheet.replaceSync(`
-.btn-link { background-color: transparent; border: 0; text-decoration: underline; color: var(--link-color); }
+.btn-link { background-color: transparent; border: 0; text-decoration: underline; }
 .fav-btn { font-size: 0.8rem }
 .fav-details { padding-left: 0.5rem }
 .invis { display: none; }`);
@@ -184,5 +202,51 @@ class CommentFavoriteButton extends HTMLElement {
     }
 }
 
+class ThemeToggle extends HTMLElement {
+    html = document.querySelector('html');
+
+    constructor() {
+        super();
+        const ls = localStorage.getItem('theme-mode') ?? 'auto';
+        this.setMode(ls);
+        const shadow = this.attachShadow({ mode: "open" });
+
+        const select = document.createElement("select");
+        for(let t of ['auto','light','dark']) {
+            const el = document.createElement('option');
+            el.value = t;
+            el.innerText = t;
+            if(t === ls) {
+                el.selected = true;
+            }
+            select.appendChild(el);
+        }
+
+        select.addEventListener('change', e => this.setMode(e.target.value));
+        shadow.appendChild(select);
+    }
+
+    setMode(mode) {
+        localStorage.setItem("theme-mode", mode);
+        switch(mode) {
+            case 'dark':
+                this.html.style.setProperty('color-scheme', 'dark');
+                document.documentElement.style.setProperty('--system-cs-is-light', 0);
+                break;
+            case 'light':
+                this.html.style.setProperty('color-scheme', 'light');
+                document.documentElement.style.setProperty('--system-cs-is-light', 1);
+                break;
+            case 'auto':
+            default:
+                const isLightMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+                this.html.style.setProperty('color-scheme', 'light dark');
+                document.documentElement.style.setProperty('--system-cs-is-light', isLightMode ? 1 : 0);
+                break;
+        }
+    }
+}
+
 customElements.define("post-favorite-button", PostFavoriteButton);
 customElements.define("comment-favorite-button", CommentFavoriteButton);
+customElements.define('theme-toggle', ThemeToggle);

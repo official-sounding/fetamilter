@@ -93,14 +93,14 @@ order by s.ID", new { userId })).ToList();
     {
         try
         {
-            var userRole = context.Roles.FirstAsync(r => r.Name == Role.UserRoleName);
+            var userRole = await context.Roles.FirstAsync(r => r.Name == Role.UserRoleName);
             var dbModel = new User()
             {
                 UserName = model.Username ?? string.Empty,
                 EmailAddress = model.Email ?? string.Empty,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
                 CreatedOn = timeProvider.GetUtcNow(),
-                RoleID = userRole.Id
+                RoleID = userRole.ID
             };
 
             await context.Users.AddAsync(dbModel);
@@ -137,10 +137,10 @@ order by s.ID", new { userId })).ToList();
         {
             claims.AddRange([
                 new(ClaimTypes.Role, Policy.DeletePost),
-                        new(ClaimTypes.Role, Policy.DeleteComment),
-                        new(ClaimTypes.Role, Policy.DisableUser),
-                        new(ClaimTypes.Role, Policy.PostOfficially),
-                        new(ClaimTypes.Role, Policy.ViewFlags)
+                new(ClaimTypes.Role, Policy.DeleteComment),
+                new(ClaimTypes.Role, Policy.DisableUser),
+                new(ClaimTypes.Role, Policy.PostOfficially),
+                new(ClaimTypes.Role, Policy.ViewFlags)
             ]);
         }
 
