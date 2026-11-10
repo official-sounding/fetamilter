@@ -10,6 +10,7 @@
             <h1>@currentSite?.Title</h1>
         </div>
         <div class="user-details">
+            <div><theme-toggle /> </div>
             @if (isLoggedIn)
             {
                 @Html.DisplayFor(m => username) @Html.Raw(" |") <a href="/logout">Logout</a>
@@ -22,7 +23,7 @@
 </header>
     <nav>
         <ul>
-            @foreach(var site in sites ?? []) 
+            @foreach(var site in sites ?? [])
             {
                 <li><a href="@site.Url">@site.Title</a></li>
             }
