@@ -1,12 +1,7 @@
 :root {
-    --text-color: #111;
-    --bg-color: #fff;
-    --link-color: blue;
-    --link-alt-color: darkviolet;
     --header-bg-color: #426746;
     --header-accent-color: #1f3c22;
     --header-fg-color: #fff;
     --header-link-color: #cc0;
     --header-link-alt-color: #cc9;
-    --accent-bg: #e0e0e0;
 }

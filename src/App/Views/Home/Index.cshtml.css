@@ -1,5 +1,5 @@
 article .logline {
-    background-color: var(--accent-bg, #e0e0e0);
+    background: var(--system-surface-color);
     padding: 0.2rem 0.1rem;
     font-size: 0.8rem;
 }
