@@ -1,6 +1,10 @@
+import { CommentFavoriteButton } from "./modules/comment-favorite-button.js";
+import { PostFavoriteButton } from "./modules/post-favorite-button.js";
 import { ThemeToggle } from "./modules/theme-toggle.js";
 
 customElements.define('theme-toggle', ThemeToggle);
+customElements.define("post-favorite-button", PostFavoriteButton);
+customElements.define("comment-favorite-button", CommentFavoriteButton);
 
 document.querySelectorAll('time').forEach($e => {
   const date = new Date($e.dateTime);
