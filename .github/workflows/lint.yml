@@ -2,11 +2,11 @@ name: lint
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths-ignore:
-    - '**/*.gitattributes'
-    - '**/*.gitignore'
-    - '**/*.md'
+      - "**/*.gitattributes"
+      - "**/*.gitignore"
+      - "**/*.md"
   pull_request:
   workflow_dispatch:
 
@@ -24,24 +24,41 @@ jobs:
       contents: read
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          filter: "tree:0"
+          persist-credentials: false
+          show-progress: false
 
-    - name: Checkout code
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        filter: 'tree:0'
-        persist-credentials: false
-        show-progress: false
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: lts/*
+          package-manager-cache: false # Disable automatic npm caching if not required
 
-    - name: Lint markdown
-      uses: davidanson/markdownlint-cli2-action@21c1be1b93ad9ed58fa840aacc3f279cde2a72ff # v24.2.0
-      with:
-        config: '.markdownlint.json'
-        globs: |
-          **/*.md
+      - name: npm install
+        working-directory: ./src/App/typescript
+        run: npm ci
 
-    - name: dotnet Format
-      run: dotnet format --verify-no-changes
+      - name: Lint markdown
+        uses: davidanson/markdownlint-cli2-action@21c1be1b93ad9ed58fa840aacc3f279cde2a72ff # v24.2.0
+        with:
+          config: ".markdownlint.json"
+          globs: |
+            **/*.md
+            !./src/App/typescript/node_modules/**/*.md
 
+      - name: dotnet Format
+        run: dotnet format --verify-no-changes
+
+      - name: ts lint
+        working-directory: ./src/App/typescript
+        run: npm run lint
+
+      - name: ts fmt
+        working-directory: ./src/App/typescript
+        run: npm run fmt:check

@@ -1,32 +1,26 @@
 export class PostFavoriteButton extends HTMLElement {
-    static observedAttributes = ["post", "full-text"] as const;
+    public static observedAttributes = ['post', 'full-text'] as const;
 
-    private pre: HTMLElement;
-    private btn: HTMLElement;
-    private post: HTMLElement;
-    private msg: HTMLElement;
+    private pre = document.createElement('span');
+    private btn = document.createElement('button');
+    private post = document.createElement('span');
+    private msg = document.createElement('span');
 
+    private favorited = false;
 
-    favorited = false;
-
-    constructor() {
+    public constructor() {
         // Always call super first in constructor
         super();
 
-        const shadow = this.attachShadow({ mode: "open" });
+        this.pre.textContent = '[';
+        this.pre.textContent = ']';
 
-        this.pre = document.createElement("span");
-        this.btn = document.createElement("button");
-        this.post = document.createElement("span");
-        this.msg = document.createElement("span");
+        const shadow = this.attachShadow({ mode: 'open' });
 
-        this.pre.innerText = "[";
-        this.post.innerText = "]";
+        this.btn.className = 'btn-link fav-btn';
+        this.msg.className = 'fav-details';
 
-        this.btn.className = "btn-link fav-btn";
-        this.msg.className = "fav-details";
-
-        this.btn.addEventListener("click", () => this.toggleFavorite());
+        this.btn.addEventListener('click', () => this.toggleFavorite());
         this.setBtnText();
         this.setWrapperClass();
 
@@ -38,19 +32,19 @@ export class PostFavoriteButton extends HTMLElement {
 .invis { display: none; }`);
 
         shadow.adoptedStyleSheets.push(sheet);
-        shadow.appendChild(this.pre);
-        shadow.appendChild(this.btn);
-        shadow.appendChild(this.post);
-        shadow.appendChild(this.msg);
+        shadow.append(this.pre);
+        shadow.append(this.btn);
+        shadow.append(this.post);
+        shadow.append(this.msg);
     }
 
-    async toggleFavorite() {
-        const postNum = this.getAttribute("post");
+    private async toggleFavorite() {
+        const postNum = this.getAttribute('post');
         if (!postNum) {
             return;
         }
 
-        const method = this.favorited ? "DELETE" : "POST";
+        const method = this.favorited ? 'DELETE' : 'POST';
         const result = await fetch(`/${postNum}/favorite`, { method });
         if (!result.ok) {
             return;
@@ -60,37 +54,37 @@ export class PostFavoriteButton extends HTMLElement {
         this.setBtnText();
         const data = await result.json();
         if (data.actionSuccessful) {
-            this.msg.innerText = this.favorited
-                ? "favorite added"
-                : "favorite removed";
+            this.msg.textContent = this.favorited
+                ? 'favorite added'
+                : 'favorite removed';
         } else {
-            this.msg.innerText = this.favorited
-                ? "favorite already added"
-                : "favorite already removed";
+            this.msg.textContent = this.favorited
+                ? 'favorite already added'
+                : 'favorite already removed';
         }
     }
 
-    setBtnText() {
+    private setBtnText() {
         this.btn.title = this.favorited
-            ? "remove favorite from this post"
-            : "add favorite to this post";
+            ? 'remove favorite from this post'
+            : 'add favorite to this post';
 
-        if (this.getAttribute("full-text") === "true") {
-            this.btn.innerText = this.favorited
-                ? "remove favorite"
-                : "add to favorites";
+        if (this.getAttribute('full-text') === 'true') {
+            this.btn.textContent = this.favorited
+                ? 'remove favorite'
+                : 'add to favorites';
         } else {
-            this.btn.innerText = this.favorited ? "-" : "+";
+            this.btn.textContent = this.favorited ? '-' : '+';
         }
     }
 
-    setWrapperClass() {
-        if (this.getAttribute("full-text") === "true") {
-            this.pre.className = "";
-            this.post.className = "";
+    private setWrapperClass() {
+        if (this.getAttribute('full-text') === 'true') {
+            this.pre.className = '';
+            this.post.className = '';
         } else {
-            this.pre.className = "invis";
-            this.post.className = "invis";
+            this.pre.className = 'invis';
+            this.post.className = 'invis';
         }
     }
 }
