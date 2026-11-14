@@ -492,3 +492,5 @@ main.db*
 efbundle.exe
 
 .env
+
+src/App/typescript/**/*.js
